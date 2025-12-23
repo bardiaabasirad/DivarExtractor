@@ -93,7 +93,7 @@ class SaleExtractor {
 
             // استخراج اطلاعات
             const adData = await page.evaluate(() => {
-                const data = { adType: 'فروش' };
+                const data = { adType: 'sell' };
 
                 // استخراج عنوان
                 const titleElement = document.querySelector('h1');
@@ -104,16 +104,16 @@ class SaleExtractor {
                 data.phoneNumber = phoneLink ? phoneLink.getAttribute('href').replace('tel:', '') : null;
 
                 // استخراج زمان و موقعیت
-                const locationElement = document.querySelector('h1 + p');
+                const locationElement = document.querySelector('h1 + div.kt-page-title__subtitle');
                 if (locationElement) {
                     const fullText = locationElement.textContent.trim();
-                    const parts = fullText.split('در');
+                    const parts = fullText.split(' در ');
                     data.timeAgo = parts[0]?.trim();
                     data.location = parts[1]?.trim();
                 }
 
                 // استخراج اطلاعات جدول اصلی (متراژ، ساخت، اتاق)
-                const mainTable = document.querySelector('table');
+                const mainTable = document.querySelector('table.kt-group-row');
                 if (mainTable) {
                     const headers = Array.from(mainTable.querySelectorAll('thead th')).map(th => th.textContent.trim());
                     const values = Array.from(mainTable.querySelectorAll('tbody td')).map(td => td.textContent.trim());
@@ -147,11 +147,13 @@ class SaleExtractor {
                             data.pricePerMeter = valueText;
                         } else if (titleText === 'طبقه') {
                             data.floor = valueText;
+                        } else if (titleText === 'متراژ') {
+                            data.extraArea = valueText;
                         }
                     }
                 });
 
-                // استخراج ویژگی‌ها (آسانسور، پارکینگ، انباری)
+                // استخراج ویژگی‌ها (آسانسور، پارکینگ، انباری) - اصلاح شده
                 data.features = {
                     elevator: null,
                     parking: null,
@@ -160,35 +162,51 @@ class SaleExtractor {
 
                 const featureTables = document.querySelectorAll('table.kt-group-row');
                 featureTables.forEach(table => {
-                    const cells = table.querySelectorAll('td');
+                    const cells = table.querySelectorAll('td.kt-group-row-item__value');
                     cells.forEach(cell => {
                         const text = cell.textContent.trim();
+                        const isDisabled = cell.classList.contains('kt-group-row-item--disabled');
 
                         if (text.includes('آسانسور')) {
-                            data.features.elevator = text.includes('دارد') && !text.includes('ندارد');
+                            data.features.elevator = !isDisabled;
                         }
                         if (text.includes('پارکینگ')) {
-                            data.features.parking = text.includes('دارد') || text === 'پارکینگ';
+                            data.features.parking = !isDisabled;
                         }
                         if (text.includes('انباری')) {
-                            data.features.warehouse = text.includes('دارد') || text === 'انباری';
+                            data.features.warehouse = !isDisabled;
                         }
                     });
                 });
 
-                // استخراج توضیحات
-                const descriptionHeader = Array.from(document.querySelectorAll('h2')).find(h =>
-                    h.textContent.trim() === 'توضیحات'
-                );
+                // استخراج توضیحات - نسخه نهایی و دقیق
+                data.description = null;
 
-                if (descriptionHeader) {
-                    const descParagraph = descriptionHeader.nextElementSibling;
-                    data.description = descParagraph ? descParagraph.textContent.trim() : null;
+                // فقط توضیحات داخل section اصلی صفحه را بگیر
+                const sections = document.querySelectorAll('section.post-page__section--padded');
+                for (const section of sections) {
+                    // بررسی اینکه h2 با عنوان "توضیحات" داخل این section وجود دارد
+                    const h2 = section.querySelector('h2.kt-title-row__title');
+                    if (h2 && h2.textContent.trim() === 'توضیحات') {
+                        // حالا پاراگراف توضیحات را پیدا کن
+                        const descParagraph = section.querySelector('p.kt-description-row__text');
+                        if (descParagraph) {
+                            const text = descParagraph.textContent.trim();
+                            // فیلتر متن پیش‌فرض
+                            if (text && text !== 'موردی برای نمایش وجود ندارد') {
+                                data.description = text;
+                                break;
+                            }
+                        }
+                    }
                 }
 
                 // استخراج دسته‌بندی
-                const categoryLink = document.querySelector('a[href*="/buy-"]');
-                data.category = categoryLink ? categoryLink.textContent.trim() : null;
+                // استخراج دقیق دسته‌بندی از breadcrumb
+                const breadcrumbLinks = document.querySelectorAll('.kt-breadcrumbs__item a[href*="/buy-"], .kt-breadcrumbs__item a[href*="/rent-"]');
+                data.category = breadcrumbLinks.length > 0
+                    ? breadcrumbLinks[breadcrumbLinks.length - 1].textContent.trim()
+                    : null;
 
                 // استخراج تصاویر - فقط با کیفیت بالا
                 data.images = [];
@@ -200,7 +218,6 @@ class SaleExtractor {
                     }
                 });
 
-                // اگر webp_post نبود، بدون thumbnail بردار
                 if (data.images.length === 0) {
                     imageElements.forEach(img => {
                         const src = img.getAttribute('src');
@@ -212,7 +229,6 @@ class SaleExtractor {
 
                 return data;
             });
-
 
             // افزودن ID و URL به داده‌ها
             adData.adId = adId;
@@ -264,8 +280,8 @@ class SaleExtractor {
         // console.log(`   📐 متراژ: ${data.area || 'ندارد'}`);
         // console.log(`   🏗️  سال ساخت: ${data.buildYear || 'ندارد'}`);
         // console.log(`   🚪 تعداد اتاق: ${data.rooms || 'ندارد'}`);
-        console.log(`   💰 قیمت کل: ${data.totalPrice || 'ندارد'}`);
-        console.log(`   💵 قیمت هر متر: ${data.pricePerMeter || 'ندارد'}`);
+        // console.log(`   💰 قیمت کل: ${data.totalPrice || 'ندارد'}`);
+        // console.log(`   💵 قیمت هر متر: ${data.pricePerMeter || 'ندارد'}`);
         // console.log(`   🏢 طبقه: ${data.floor || 'ندارد'}`);
         // console.log(`   🛗 آسانسور: ${data.features.elevator === null ? 'نامشخص' : (data.features.elevator ? '✓ دارد' : '✗ ندارد')}`);
         // console.log(`   🚗 پارکینگ: ${data.features.parking === null ? 'نامشخص' : (data.features.parking ? '✓ دارد' : '✗ ندارد')}`);

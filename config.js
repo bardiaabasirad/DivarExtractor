@@ -1,11 +1,10 @@
 export const targetUrl = 'https://divar.ir/s/nurabad/buy-residential';
 export const checkInterval = 60000;
 export const apiConfig = {
-    endpoint: 'https://malko.ir/api/new-place', // آدرس API سرور شما
+    endpoint: 'http://localhost:8000/new-place', // آدرس API سرور شما
     method: 'POST',
     headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer YOUR_API_TOKEN' // توکن احراز هویت
     }
 };
 export const puppeteerConfig = {

@@ -65,7 +65,7 @@ class RentExtractor {
 
             // استخراج اطلاعات
             const adData = await page.evaluate(() => {
-                const data = { adType: 'اجاره' };
+                const data = { adType: 'rent' };
 
                 // **استخراج شماره تلفن**
                 const phoneLink = document.querySelector('a[href^="tel:"]');
