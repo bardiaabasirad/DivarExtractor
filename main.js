@@ -1,5 +1,5 @@
-import { launch } from 'puppeteer';
-import { targetUrl, checkInterval, puppeteerConfig, timeouts } from './config.js';
+import {launch} from 'puppeteer';
+import {checkInterval, puppeteerConfig, targetUrl, timeouts, externalRefsUrl} from './config.js';
 import SaleExtractor from './saleExtractor.js';
 import RentExtractor from './rentExtractor.js';
 import CookieManager from './cookieManager.js';
@@ -45,13 +45,25 @@ class DivarMonitor {
             });
             
             await this.cookieManager.verifyLogin(this.mainPage);
-        } else {
-            // console.log('ℹ️  بدون کوکی ادامه می‌دهیم (حالت مهمان)');
         }
     }
 
     async getAllAdsLinks() {
         try {
+            // 1. دریافت لیست adIdهای قبلی از API
+            let existingAdIds = [];
+            try {
+                const response = await fetch(externalRefsUrl);
+                if (response.ok) {
+                    existingAdIds = await response.json();
+                    console.log(`✅ تعداد adIdهای موجود در دیتابیس: ${existingAdIds.length}`);
+                }
+            } catch (apiError) {
+                console.warn('⚠️  خطا در دریافت لیست adIdهای موجود:', apiError.message);
+                // در صورت خطا، ادامه می‌دهیم با لیست خالی
+            }
+
+            // 2. بارگذاری صفحه دیوار
             await this.mainPage.goto(this.targetUrl, {
                 waitUntil: 'networkidle2',
                 timeout: timeouts.pageLoad
@@ -61,13 +73,14 @@ class DivarMonitor {
                 timeout: timeouts.elementWait
             });
 
-            const adsData = await this.mainPage.evaluate(() => {
+            // 3. استخراج لینک‌ها و فیلتر کردن
+            return await this.mainPage.evaluate((existingIds) => {
                 const ads = [];
                 let index = 0;
-                
+
                 while (true) {
-                    const dataIndexDiv = document.querySelector(`[data-index="${index}"]`);        
-                    
+                    const dataIndexDiv = document.querySelector(`[data-index="${index}"]`);
+
                     if (!dataIndexDiv) break;
 
                     const firstChildDiv = dataIndexDiv.querySelector(':scope > div:first-child');
@@ -85,23 +98,25 @@ class DivarMonitor {
                     const href = linkElement.getAttribute('href');
                     if (href) {
                         const urlParts = href.split('/');
-                        console.log(urlParts);
                         const adId = urlParts[urlParts.length - 1];
-                        
-                        // تشخیص نوع آگهی: بررسی تمام محتوای متنی کارت
-                        let adType = 'sale'; // پیش‌فرض
-                        
-                        // دریافت تمام متن‌های داخل کارت
+
+                        // بررسی وجود adId در لیست موجود
+                        if (existingIds.includes(adId)) {
+                            console.log(`⏭️  آگهی ${adId} قبلاً ثبت شده است، رد شد`);
+                            index++;
+                            continue;
+                        }
+
+                        // تشخیص نوع آگهی
+                        let adType = 'sale';
                         const allText = dataIndexDiv.innerText || dataIndexDiv.textContent || '';
-                        
-                        // بررسی وجود کلمات کلیدی اجاره
-                        // توجه: از includes استفاده می‌کنیم تا حتی اگر فرمت متن متفاوت باشد، پیدا شود
-                        if (allText.includes('ودیعه') || 
-                            allText.includes('اجاره') || 
+
+                        if (allText.includes('ودیعه') ||
+                            allText.includes('اجاره') ||
                             allText.includes('رهن')) {
                             adType = 'rent';
                         }
-                        
+
                         ads.push({
                             index: index,
                             adId: adId,
@@ -115,12 +130,9 @@ class DivarMonitor {
                 }
 
                 return ads;
-            });
-
-            return adsData;
+            }, existingAdIds);
 
         } catch (error) {
-            console.error('❌ خطا در دریافت لیست آگهی‌ها:', error.message);
             this.statistics.errors++;
             return [];
         }
@@ -131,26 +143,10 @@ class DivarMonitor {
 
         const adsData = await this.getAllAdsLinks();
 
-        if (adsData.length === 0) {
-            // console.log('⚠️  هیچ آگهی‌ای یافت نشد');
-            this.displayStatistics();
-            return;
-        }
-
-        // console.log(`📊 تعداد آگهی‌های یافت شده: ${adsData.length}`);
         this.statistics.totalAdsFound += adsData.length;
 
-        for (const ad of adsData) {
-            // console.log(`\n${'─'.repeat(70)}`);
-            // console.log(`📍 آگهی #${ad.index + 1} از ${adsData.length}`);
-            // console.log(`🆔 ID: ${ad.adId}`);
-            // console.log(`📋 نوع: ${ad.type === 'sale' ? '🏷️  فروش' : '🏠 اجاره'}`);
-            
-            // نمایش اطلاعات دیباگ (بعداً حذف کنید)
-            if (ad.debugInfo) {
-                // console.log(`🔍 دیباگ: ودیعه=${ad.debugInfo.hasDeposit}, اجاره=${ad.debugInfo.hasRent}, رهن=${ad.debugInfo.hasFullMortgage}`);
-                // console.log(`📝 متن: ${ad.debugInfo.textPreview}...`);
-            }
+        for (let i = 0; i < adsData.length; i++) {
+            const ad = adsData[i];
 
             this.statistics.totalAdsProcessed++;
 
@@ -171,21 +167,13 @@ class DivarMonitor {
                 this.statistics.errors++;
             }
 
-            // تأخیر بین آگهی‌ها
-            if (ad.index < adsData.length - 1) {
-                // console.log('\n⏳ انتظار 2 ثانیه تا آگهی بعدی...');
-                await new Promise(resolve => setTimeout(resolve, 2000));
+            // تأخیر ۵ دقیقه بین پردازش هر آگهی (به جز آخرین آگهی)
+            if (i < adsData.length - 1) {
+                const delayMs = timeouts.delayMinutes * 60 * 1000;
+
+                console.log(`⏳ صبر ${timeouts.delayMinutes} دقیقه تا پردازش آگهی بعدی...`);
+                await new Promise(resolve => setTimeout(resolve, delayMs));
             }
-        }
-
-        // console.log(`\n${'═'.repeat(70)}`);
-        this.displayStatistics();
-    }
-
-    displayStatistics() {        
-        if (this.statistics.totalAdsProcessed > 0) {
-            const successRate = ((this.statistics.successfullySent / this.statistics.totalAdsProcessed) * 100).toFixed(1);
-            // console.log(`   • نرخ موفقیت: ${successRate}%`);
         }
     }
 
@@ -200,8 +188,6 @@ class DivarMonitor {
     async close() {
         if (this.browser) {
             await this.browser.close();
-            // console.log('\n👋 مرورگر بسته شد');
-            this.displayStatistics();
         }
     }
 }
@@ -211,20 +197,15 @@ class DivarMonitor {
     const monitor = new DivarMonitor();
 
     try {
-        // console.log('🚀 در حال راه‌اندازی سیستم مانیتورینگ دیوار...\n');
         await monitor.initialize();
-        // console.log('✅ سیستم با موفقیت راه‌اندازی شد\n');
-        
         await monitor.startMonitoring();
 
         process.on('SIGINT', async () => {
-            // console.log('\n\n⚠️  دریافت سیگنال توقف...');
             await monitor.close();
             process.exit(0);
         });
 
     } catch (error) {
-        console.error('❌ خطای کلی:', error);
         await monitor.close();
         process.exit(1);
     }

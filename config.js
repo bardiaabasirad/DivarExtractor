@@ -1,7 +1,8 @@
 export const targetUrl = 'https://divar.ir/s/nurabad/buy-residential';
+export const externalRefsUrl = 'https://malko.ir/external-refs';
 export const checkInterval = 60000;
 export const apiConfig = {
-    endpoint: 'http://localhost:8000/new-place', // آدرس API سرور شما
+    endpoint: 'https://malko.ir/new-place', // آدرس API سرور شما
     method: 'POST',
     headers: {
         'Content-Type': 'application/json',
@@ -21,5 +22,6 @@ export const puppeteerConfig = {
 };
 export const timeouts = {
     pageLoad: 30000,
-    elementWait: 10000
+    elementWait: 10000,
+    delayMinutes: 5,
 };

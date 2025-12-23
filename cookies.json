@@ -1,7 +1,7 @@
 [
     {
         "domain": ".divar.ir",
-        "expirationDate": 1801061513.002564,
+        "expirationDate": 1801078443.421552,
         "hostOnly": false,
         "httpOnly": false,
         "name": "_ga",
@@ -10,12 +10,12 @@
         "secure": false,
         "session": false,
         "storeId": "0",
-        "value": "GA1.1.1725650727.1766497270",
+        "value": "GA1.1.243954129.1765589714",
         "id": 1
     },
     {
         "domain": ".divar.ir",
-        "expirationDate": 1801061532.839607,
+        "expirationDate": 1801078486.527666,
         "hostOnly": false,
         "httpOnly": false,
         "name": "_ga_1G1K17N77F",
@@ -24,12 +24,12 @@
         "secure": false,
         "session": false,
         "storeId": "0",
-        "value": "GS2.1.s1766497270$o1$g1$t1766501532$j40$l0$h0",
+        "value": "GS2.1.s1766516345$o10$g1$t1766518486$j17$l0$h0",
         "id": 2
     },
     {
         "domain": ".divar.ir",
-        "expirationDate": 1774273270,
+        "expirationDate": 1773365714,
         "hostOnly": false,
         "httpOnly": false,
         "name": "_gcl_au",
@@ -38,12 +38,12 @@
         "secure": false,
         "session": false,
         "storeId": "0",
-        "value": "1.1.83366278.1766497270",
+        "value": "1.1.952580741.1765589714",
         "id": 3
     },
     {
         "domain": ".divar.ir",
-        "expirationDate": 1798037531,
+        "expirationDate": 1798054482,
         "hostOnly": false,
         "httpOnly": false,
         "name": "_vid_t",
@@ -52,12 +52,12 @@
         "secure": false,
         "session": false,
         "storeId": "0",
-        "value": "rhjZUfQJdP0zqskXDFTRDtl1O6h4fivD3JvDiWefKdLc3VRHbhWofJhi8yruamufGpaqlJxP+As42g==",
+        "value": "RLjIJzmANwAGOWScswpstb+CSXpAljpbPtnYPzk3B316TP0iokFURGsLnXy8n+RkBfm9y27/LZSxdg==",
         "id": 4
     },
     {
         "domain": ".divar.ir",
-        "expirationDate": 1801057268.694167,
+        "expirationDate": 1800149711.990159,
         "hostOnly": false,
         "httpOnly": false,
         "name": "cdid",
@@ -66,12 +66,12 @@
         "secure": false,
         "session": false,
         "storeId": "0",
-        "value": "749d1a1f-9a96-4486-8fcf-47028aaffedb",
+        "value": "1ad6b063-e178-40b7-a6c0-1feff4f53a34",
         "id": 5
     },
     {
         "domain": ".divar.ir",
-        "expirationDate": 1801061511.728038,
+        "expirationDate": 1801078442.430065,
         "hostOnly": false,
         "httpOnly": false,
         "name": "city",
@@ -85,7 +85,7 @@
     },
     {
         "domain": ".divar.ir",
-        "expirationDate": 1801061529.250662,
+        "expirationDate": 1801078480.456756,
         "hostOnly": false,
         "httpOnly": false,
         "name": "csid",
@@ -94,12 +94,12 @@
         "secure": false,
         "session": false,
         "storeId": "0",
-        "value": "8ef121eeaee3e7b89b",
+        "value": "f032308a9377e0b7f6",
         "id": 7
     },
     {
         "domain": ".divar.ir",
-        "expirationDate": 1801057268.693579,
+        "expirationDate": 1800149711.989985,
         "hostOnly": false,
         "httpOnly": false,
         "name": "did",
@@ -108,12 +108,26 @@
         "secure": false,
         "session": false,
         "storeId": "0",
-        "value": "ee208deb-db1f-4507-b98c-ebe45ed2e36e",
+        "value": "0c9d747f-b433-4669-b57c-796ded8ba837",
         "id": 8
     },
     {
         "domain": ".divar.ir",
-        "expirationDate": 1766587911.727774,
+        "expirationDate": 1800761882.198338,
+        "hostOnly": false,
+        "httpOnly": false,
+        "name": "disable_map_view",
+        "path": "/",
+        "sameSite": "lax",
+        "secure": false,
+        "session": false,
+        "storeId": "0",
+        "value": "true",
+        "id": 9
+    },
+    {
+        "domain": ".divar.ir",
+        "expirationDate": 1766602744.586373,
         "hostOnly": false,
         "httpOnly": false,
         "name": "ff",
@@ -122,12 +136,12 @@
         "secure": false,
         "session": false,
         "storeId": "0",
-        "value": "%7B%22f%22%3A%7B%22foreigner_payment_enabled%22%3Atrue%2C%22enable_filter_post_count_web%22%3Atrue%2C%22enable_non_lazy_image_post_card%22%3Atrue%2C%22device_fp_enable%22%3Atrue%2C%22enable-places-selector-online-search-web%22%3Atrue%7D%2C%22e%22%3A1766505101249%2C%22r%22%3A1766587901249%7D",
-        "id": 9
+        "value": "%7B%22f%22%3A%7B%22foreigner_payment_enabled%22%3Atrue%2C%22enable_filter_post_count_web%22%3Atrue%2C%22enable_non_lazy_image_post_card%22%3Atrue%2C%22device_fp_enable%22%3Atrue%2C%22enable-places-selector-online-search-web%22%3Atrue%7D%2C%22e%22%3A1766519946279%2C%22r%22%3A1766602746279%7D",
+        "id": 10
     },
     {
         "domain": ".divar.ir",
-        "expirationDate": 1801061511.727985,
+        "expirationDate": 1801078442.429894,
         "hostOnly": false,
         "httpOnly": false,
         "name": "multi-city",
@@ -137,11 +151,11 @@
         "session": false,
         "storeId": "0",
         "value": "nurabad%7C",
-        "id": 10
+        "id": 11
     },
     {
         "domain": ".divar.ir",
-        "expirationDate": 1801061511.727941,
+        "expirationDate": 1801078442.429711,
         "hostOnly": false,
         "httpOnly": false,
         "name": "referrer",
@@ -151,11 +165,11 @@
         "session": false,
         "storeId": "0",
         "value": "",
-        "id": 11
+        "id": 12
     },
     {
         "domain": ".divar.ir",
-        "expirationDate": 1801061512.914812,
+        "expirationDate": 1801078443.249272,
         "hostOnly": false,
         "httpOnly": false,
         "name": "theme",
@@ -165,11 +179,11 @@
         "session": false,
         "storeId": "0",
         "value": "dark",
-        "id": 12
+        "id": 13
     },
     {
         "domain": ".divar.ir",
-        "expirationDate": 1801061529.228455,
+        "expirationDate": 1801078480.39242,
         "hostOnly": false,
         "httpOnly": false,
         "name": "token",
@@ -178,7 +192,7 @@
         "secure": false,
         "session": false,
         "storeId": "0",
-        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaWQiOiI4NmQyNjdiZS0xNDA1LTRiZDMtOTM3YS1iZjQ2NTdjZDlhYTciLCJ1aWQiOiIxMzlmNzFlNS05MWE1LTRmYTctYWE2Ni1kMWU0MWUyNWNhYWQiLCJ1c2VyIjoiMDkzODIxMjYwMDgiLCJ2ZXJpZmllZF90aW1lIjoxNzY2NTAxNTE4LCJpc3MiOiJhdXRoIiwidXNlci10eXBlIjoicGVyc29uYWwiLCJ1c2VyLXR5cGUtZmEiOiLZvtmG2YQg2LTYrti124wiLCJleHAiOjE3NjkwOTM1MTgsImlhdCI6MTc2NjUwMTUxOH0.mYgCvUvJoeYJffnAEZq4LE_zN4gVAAMG42qH7hDu07o",
-        "id": 13
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzaWQiOiJmYWQyNGFkNy01NjZmLTQ0YjQtYWZkMy1jMzRhZmZiNTcxYmYiLCJ1aWQiOiJkOWYzYWZmMy0xMjdmLTQ3ZGEtODE0OS03NmM1ZmE1OWYyMDkiLCJ1c2VyIjoiMDkxNjU3OTcwNjYiLCJ2ZXJpZmllZF90aW1lIjoxNzY2NTE4NDgyLCJpc3MiOiJhdXRoIiwidXNlci10eXBlIjoicGVyc29uYWwiLCJ1c2VyLXR5cGUtZmEiOiLZvtmG2YQg2LTYrti124wiLCJleHAiOjE3NjkxMTA0ODIsImlhdCI6MTc2NjUxODQ4Mn0.iqgsX0_H8alDBEANIlVy6tpo45Omlz5M2TXGFBo5_is",
+        "id": 14
     }
 ]

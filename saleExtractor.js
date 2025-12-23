@@ -1,4 +1,4 @@
-import { apiConfig, timeouts } from './config.js';
+import {apiConfig, timeouts} from './config.js';
 
 class SaleExtractor {
     constructor(browser) {
@@ -148,7 +148,7 @@ class SaleExtractor {
                         } else if (titleText === 'طبقه') {
                             data.floor = valueText;
                         } else if (titleText === 'متراژ') {
-                            data.extraArea = valueText;
+                            data.extraArea = valueText.replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[^\d]/g, '');
                         }
                     }
                 });
@@ -235,22 +235,29 @@ class SaleExtractor {
             adData.adUrl = adUrl;
 
             // تبدیل قیمت‌ها به عدد خالص
+            // بعد از evaluate، در Node.js تبدیل کنید
             if (adData.totalPrice) {
-                const rawPrice = adData.totalPrice; // ذخیره برای نمایش
-                adData.totalPrice = this.convertPersianPriceToNumber(rawPrice);
+                adData.totalPrice = this.convertPersianPriceToNumber(adData.totalPrice);
             }
 
             if (adData.pricePerMeter) {
-                const rawPrice = adData.pricePerMeter;
-                adData.pricePerMeter = this.convertPersianPriceToNumber(rawPrice);
-            }        
+                adData.pricePerMeter = this.convertPersianPriceToNumber(adData.pricePerMeter);
+            }
+
+            if (adData.area) {
+                adData.area = this.convertPersianPriceToNumber(adData.area);
+            }
+
+            if (adData.buildYear) {
+                adData.buildYear = this.convertPersianPriceToNumber(adData.buildYear);
+            }
 
             if (adData.rooms) {
                 adData.rooms = this.convertPersianPriceToNumber(adData.rooms);
             }
 
-            if (adData.buildYear) {
-                adData.buildYear = this.convertPersianPriceToNumber(adData.buildYear);
+            if (adData.floor) {
+                adData.floor = this.convertPersianPriceToNumber(adData.floor);
             }
 
             this.displayExtractedData(adData);
@@ -269,25 +276,6 @@ class SaleExtractor {
     }
 
     displayExtractedData(data) {
-        // console.log('\n✅ اطلاعات استخراج شده (فروش):');
-        // console.log(`   🆔 شناسه: ${data.adId}`);
-        // console.log(`   📞 تلفن: ${data.phoneNumber || 'ندارد'}`);
-        // console.log(`   📝 نوع: ${data.adType}`);
-        // console.log(`   📌 عنوان: ${data.title || 'ندارد'}`);
-        // console.log(`   🏷️  دسته: ${data.category || 'ندارد'}`);
-        // console.log(`   ⏰ زمان: ${data.timeAgo || 'ندارد'}`);
-        // console.log(`   📍 موقعیت: ${data.location || 'ندارد'}`);
-        // console.log(`   📐 متراژ: ${data.area || 'ندارد'}`);
-        // console.log(`   🏗️  سال ساخت: ${data.buildYear || 'ندارد'}`);
-        // console.log(`   🚪 تعداد اتاق: ${data.rooms || 'ندارد'}`);
-        // console.log(`   💰 قیمت کل: ${data.totalPrice || 'ندارد'}`);
-        // console.log(`   💵 قیمت هر متر: ${data.pricePerMeter || 'ندارد'}`);
-        // console.log(`   🏢 طبقه: ${data.floor || 'ندارد'}`);
-        // console.log(`   🛗 آسانسور: ${data.features.elevator === null ? 'نامشخص' : (data.features.elevator ? '✓ دارد' : '✗ ندارد')}`);
-        // console.log(`   🚗 پارکینگ: ${data.features.parking === null ? 'نامشخص' : (data.features.parking ? '✓ دارد' : '✗ ندارد')}`);
-        // console.log(`   📦 انباری: ${data.features.warehouse === null ? 'نامشخص' : (data.features.warehouse ? '✓ دارد' : '✗ ندارد')}`);
-        // console.log(`   🖼️  تعداد تصاویر: ${data.images.length}`);
-
         if (data.description) {
             const shortDesc = data.description.length > 80
                 ? data.description.substring(0, 80) + '...'
