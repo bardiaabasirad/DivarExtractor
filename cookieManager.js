@@ -1,5 +1,4 @@
 import fs from 'fs/promises';
-import path from 'path';
 
 class CookieManager {
     constructor(cookieFilePath = './cookies.json') {
@@ -9,9 +8,7 @@ class CookieManager {
     async loadCookies() {
         try {
             const cookiesData = await fs.readFile(this.cookieFilePath, 'utf-8');
-            const cookies = JSON.parse(cookiesData);
-            
-            return cookies;
+            return JSON.parse(cookiesData);
             
         } catch (error) {
             if (error.code === 'ENOENT') {
