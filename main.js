@@ -3,6 +3,7 @@ import {checkInterval, puppeteerConfig, targetUrl, timeouts, externalRefsUrl} fr
 import SaleExtractor from './saleExtractor.js';
 import RentExtractor from './rentExtractor.js';
 import CookieManager from './cookieManager.js';
+import {sendAdToServer} from "./services/adSender.js";
 
 class DivarMonitor {
     constructor() {
@@ -155,10 +156,14 @@ class DivarMonitor {
             // استفاده از Extractor مناسب
             if (ad.type === 'sale') {
                 this.statistics.saleAds++;
-                success = await this.saleExtractor.processAd(ad.fullUrl);
+                const adData = await this.saleExtractor.processAd(ad.fullUrl);
+                if (!adData) continue;
+                await sendAdToServer(adData);
             } else {
-                this.statistics.rentAds++;
-                // success = await this.rentExtractor.processAd(ad.fullUrl);
+                // this.statistics.rentAds++;
+                // const adData = await this.rentExtractor.processAd(ad.fullUrl);
+                // if (! adData) continue;
+                // await sendAdToServer(adData);
             }
 
             if (success) {
