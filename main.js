@@ -1,9 +1,10 @@
 import {launch} from 'puppeteer';
 import {checkInterval, puppeteerConfig, targetUrl, timeouts, externalRefsUrl} from './config.js';
-import SaleExtractor from './saleExtractor.js';
-import RentExtractor from './rentExtractor.js';
+import SaleExtractor from './extractors/saleExtractor.js';
+import RentExtractor from './extractors/rentExtractor.js';
 import CookieManager from './cookieManager.js';
 import {sendAdToServer} from "./services/adSender.js";
+import {loadBlacklist} from "./utils/blacklist.js";
 
 class DivarMonitor {
     constructor() {
@@ -61,10 +62,14 @@ class DivarMonitor {
                 }
             } catch (apiError) {
                 console.warn('⚠️  خطا در دریافت لیست adIdهای موجود:', apiError.message);
-                // در صورت خطا، ادامه می‌دهیم با لیست خالی
             }
 
-            // 2. بارگذاری صفحه دیوار
+            // 2. بارگذاری لیست سیاه
+            const blacklist = loadBlacklist();
+            const blacklistedAdIds = blacklist.map(item => item.adId);
+            console.log(`🚫 تعداد آگهی‌های لیست سیاه: ${blacklistedAdIds.length}`);
+
+            // 3. بارگذاری صفحه دیوار
             await this.mainPage.goto(this.targetUrl, {
                 waitUntil: 'networkidle2',
                 timeout: timeouts.pageLoad
@@ -74,8 +79,8 @@ class DivarMonitor {
                 timeout: timeouts.elementWait
             });
 
-            // 3. استخراج لینک‌ها و فیلتر کردن
-            return await this.mainPage.evaluate((existingIds) => {
+            // 4. استخراج لینک‌ها و فیلتر کردن
+            return await this.mainPage.evaluate((existingIds, blacklistedIds) => {
                 const ads = [];
                 let index = 0;
 
@@ -101,20 +106,26 @@ class DivarMonitor {
                         const urlParts = href.split('/');
                         const adId = urlParts[urlParts.length - 1];
 
-                        // بررسی وجود adId در لیست موجود
+                        // بررسی وجود در لیست موجود یا لیست سیاه
                         if (existingIds.includes(adId)) {
                             console.log(`⏭️  آگهی ${adId} قبلاً ثبت شده است، رد شد`);
                             index++;
                             continue;
                         }
 
-                        // تشخیص نوع آگهی
-                        let adType = 'sale';
-                        const allText = dataIndexDiv.innerText || dataIndexDiv.textContent || '';
+                        if (blacklistedIds.includes(adId)) {
+                            console.log(`🚫 آگهی ${adId} در لیست سیاه است، رد شد`);
+                            index++;
+                            continue;
+                        }
 
-                        if (allText.includes('ودیعه') ||
-                            allText.includes('اجاره') ||
-                            allText.includes('رهن')) {
+                        // ✅ تغییر: فقط متن همین آگهی را بررسی کن
+                        let adType = 'sale';
+                        const cardText = firstChildDiv.innerText || firstChildDiv.textContent || '';
+
+                        if (cardText.includes('ودیعه') ||
+                            cardText.includes('اجاره') ||
+                            cardText.includes('رهن')) {
                             adType = 'rent';
                         }
 
@@ -131,7 +142,7 @@ class DivarMonitor {
                 }
 
                 return ads;
-            }, existingAdIds);
+            }, existingAdIds, blacklistedAdIds);
 
         } catch (error) {
             this.statistics.errors++;
@@ -157,13 +168,13 @@ class DivarMonitor {
             if (ad.type === 'sale') {
                 this.statistics.saleAds++;
                 const adData = await this.saleExtractor.processAd(ad.fullUrl);
-                if (!adData) continue;
+                if (! adData) continue;
                 await sendAdToServer(adData);
             } else {
-                // this.statistics.rentAds++;
-                // const adData = await this.rentExtractor.processAd(ad.fullUrl);
-                // if (! adData) continue;
-                // await sendAdToServer(adData);
+                this.statistics.rentAds++;
+                const adData = await this.rentExtractor.processAd(ad.fullUrl);
+                if (! adData) continue;
+                await sendAdToServer(adData);
             }
 
             if (success) {

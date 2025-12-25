@@ -1,5 +1,5 @@
-import BaseExtractor from './extractors/BaseExtractor.js';
-import { convertPersianPriceToNumber } from './utils/priceUtils.js';
+import BaseExtractor from './BaseExtractor.js';
+import { convertPersianPriceToNumber } from '../utils/priceUtils.js';
 
 class SaleExtractor extends BaseExtractor {
 
@@ -18,6 +18,7 @@ class SaleExtractor extends BaseExtractor {
         const { page, data } = result;
 
         try {
+
             const priceData = await page.evaluate(() => {
                 const rows = document.querySelectorAll('.kt-unexpandable-row');
 

@@ -2,7 +2,6 @@ import { apiConfig } from '../config.js';
 
 export async function sendAdToServer(data) {
     console.log('\n📤 در حال ارسال به سرور...');
-    console.log('data:', data);
 
     try {
         const response = await fetch(apiConfig.endpoint, {

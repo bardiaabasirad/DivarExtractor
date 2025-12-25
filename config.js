@@ -1,4 +1,5 @@
-export const targetUrl = 'https://divar.ir/s/nurabad/buy-residential';
+export const targetUrl = 'https://divar.ir/s/nurabad/real-estate';
+export const cityId = 21; // Khorramabad: 9 | Delfan: 21 | Aleshtar: 3
 export const externalRefsUrl = 'https://malko.ir/external-refs';
 export const checkInterval = 60000;
 export const apiConfig = {
@@ -23,5 +24,5 @@ export const puppeteerConfig = {
 export const timeouts = {
     pageLoad: 30000,
     elementWait: 10000,
-    delayMinutes: 5,
+    delayMinutes: 10,
 };
