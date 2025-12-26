@@ -1,5 +1,11 @@
-export const targetUrl = 'https://divar.ir/s/nurabad/real-estate';
-export const cityId = 21; // Khorramabad: 9 | Delfan: 21 | Aleshtar: 3
+// Khorramabad
+export const targetUrl = 'https://divar.ir/s/khorramabad/real-estate';
+export const cityId = 9;
+
+// Delfan
+// export const targetUrl = 'https://divar.ir/s/nurabad/real-estate';
+// export const cityId = 21;
+
 export const externalRefsUrl = 'https://malko.ir/external-refs';
 export const checkInterval = 60000;
 export const apiConfig = {
