@@ -185,9 +185,11 @@ class DivarMonitor {
 
             // تأخیر ۵ دقیقه بین پردازش هر آگهی (به جز آخرین آگهی)
             if (i < adsData.length - 1) {
-                const delayMs = timeouts.delayMinutes * 60 * 1000;
+                let delay = Math.floor(Math.random() * (timeouts.maxDelayMinutes - timeouts.minDelayMinutes + 1)) + timeouts.minDelayMinutes;
 
-                console.log(`⏳ صبر ${timeouts.delayMinutes} دقیقه تا پردازش آگهی بعدی...`);
+                const delayMs = delay * 60 * 1000;
+
+                console.log(`⏳ صبر ${delay} دقیقه تا پردازش آگهی بعدی...`);
                 await new Promise(resolve => setTimeout(resolve, delayMs));
             }
         }

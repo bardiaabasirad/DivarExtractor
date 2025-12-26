@@ -18,8 +18,6 @@ class RentExtractor extends BaseExtractor {
         const { page, data } = result;
 
         try {
-            console.log('🔄 در حال استخراج اطلاعات ودیعه و اجاره...');
-
             const rentInfo = await page.evaluate(() => {
                 const rentData = {
                     deposit: null,
@@ -36,8 +34,6 @@ class RentExtractor extends BaseExtractor {
                     if (titleElement && valueElement) {
                         const title = titleElement.textContent.trim();
                         const value = valueElement.textContent.trim();
-
-                        console.log(`[kt-unexpandable-row] پیدا شد - ${title}: ${value}`);
 
                         if (title === 'ودیعه') {
                             rentData.deposit = value;
@@ -56,8 +52,6 @@ class RentExtractor extends BaseExtractor {
                             th.textContent.trim()
                         );
 
-                        console.log('[table.kt-group-row] هدرهای یافت شده:', headers);
-
                         // بررسی اینکه این جدول مربوط به ودیعه و اجاره است
                         const hasDeposit = headers.some(h => h.includes('ودیعه'));
                         const hasRent = headers.some(h => h.includes('اجاره'));
@@ -67,25 +61,20 @@ class RentExtractor extends BaseExtractor {
                                 td.textContent.trim()
                             );
 
-                            console.log('[table.kt-group-row] مقادیر یافت شده:', values);
-
                             const depositIndex = headers.findIndex(h => h.includes('ودیعه'));
                             const rentIndex = headers.findIndex(h => h.includes('اجاره'));
 
                             if (depositIndex >= 0 && values[depositIndex]) {
                                 rentData.deposit = values[depositIndex];
-                                console.log(`[table.kt-group-row] ودیعه: ${rentData.deposit}`);
                             }
 
                             if (rentIndex >= 0 && values[rentIndex]) {
                                 rentData.monthlyRent = values[rentIndex];
-                                console.log(`[table.kt-group-row] اجاره ماهانه: ${rentData.monthlyRent}`);
                             }
                         }
                     });
                 }
 
-                console.log('نتیجه نهایی استخراج:', rentData);
                 return rentData;
             });
 
@@ -95,9 +84,7 @@ class RentExtractor extends BaseExtractor {
 
             // تبدیل قیمت‌های فارسی به عدد (در محیط Node.js)
             if (data.deposit) {
-                console.log('🔄 تبدیل ودیعه:', data.deposit);
                 const convertedDeposit = convertPersianPriceToNumber(data.deposit);
-                console.log('✅ ودیعه تبدیل شد:', convertedDeposit);
                 data.deposit = convertedDeposit;
             }
 
@@ -106,13 +93,6 @@ class RentExtractor extends BaseExtractor {
             }
 
             await page.close();
-
-            console.log('✅ استخراج کامل شد:', {
-                deposit: data.deposit,
-                monthlyRent: data.monthlyRent,
-                area: data.area,
-                title: data.title
-            });
 
             return data;
 

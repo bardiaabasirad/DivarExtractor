@@ -24,5 +24,6 @@ export const puppeteerConfig = {
 export const timeouts = {
     pageLoad: 30000,
     elementWait: 10000,
-    delayMinutes: 10,
+    minDelayMinutes: 10,
+    maxDelayMinutes: 15,
 };
