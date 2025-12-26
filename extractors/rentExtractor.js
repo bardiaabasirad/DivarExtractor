@@ -89,8 +89,6 @@ class RentExtractor extends BaseExtractor {
                 return rentData;
             });
 
-            console.log('✅ داده‌های خام استخراج شد:', rentInfo);
-
             // اضافه کردن به data
             data.deposit = rentInfo.deposit;
             data.monthlyRent = rentInfo.monthlyRent;
