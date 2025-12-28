@@ -1,11 +1,12 @@
 // Khorramabad
-export const targetUrl = 'https://divar.ir/s/khorramabad/real-estate';
-export const cityId = 9;
+// export const targetUrl = 'https://divar.ir/s/khorramabad/real-estate';
+// export const cityId = 9;
 
 // Delfan
-// export const targetUrl = 'https://divar.ir/s/nurabad/real-estate';
-// export const cityId = 21;
+export const targetUrl = 'https://divar.ir/s/nurabad/real-estate';
+export const cityId = 21;
 
+import { getChromeExecutablePath } from './utils/chromePath.js';
 export const externalRefsUrl = 'https://malko.ir/external-refs';
 export const checkInterval = 60000;
 export const apiConfig = {
@@ -16,20 +17,22 @@ export const apiConfig = {
     }
 };
 export const puppeteerConfig = {
-    headless: true,
+    headless: true, // چون داری با سایت حساس کار می‌کنی
+    executablePath: getChromeExecutablePath(),
+    defaultViewport: {
+        width: 1920,
+        height: 1080
+    },
     args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--disable-gpu',
-        '--window-size=1920,1080',
-        '--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        '--disable-blink-features=AutomationControlled'
     ]
 };
 export const timeouts = {
     pageLoad: 30000,
     elementWait: 10000,
-    minDelayMinutes: 3,
-    maxDelayMinutes: 10,
+    minDelayMinutes: 5,
+    maxDelayMinutes: 15,
 };

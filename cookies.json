@@ -1,7 +1,7 @@
 [
     {
         "domain": ".divar.ir",
-        "expirationDate": 1801481230.398026,
+        "expirationDate": 1801484221.870423,
         "hostOnly": false,
         "httpOnly": false,
         "name": "_ga",
@@ -15,7 +15,7 @@
     },
     {
         "domain": ".divar.ir",
-        "expirationDate": 1801481233.928583,
+        "expirationDate": 1801484221.869551,
         "hostOnly": false,
         "httpOnly": false,
         "name": "_ga_1G1K17N77F",
@@ -24,7 +24,7 @@
         "secure": false,
         "session": false,
         "storeId": "0",
-        "value": "GS2.1.s1766921230$o18$g1$t1766921233$j57$l0$h0",
+        "value": "GS2.1.s1766924221$o19$g0$t1766924221$j60$l0$h0",
         "id": 2
     },
     {
@@ -71,7 +71,7 @@
     },
     {
         "domain": ".divar.ir",
-        "expirationDate": 1801481225.092577,
+        "expirationDate": 1801484209.42461,
         "hostOnly": false,
         "httpOnly": false,
         "name": "city",
@@ -85,7 +85,7 @@
     },
     {
         "domain": ".divar.ir",
-        "expirationDate": 1801481225.886107,
+        "expirationDate": 1801484209.985116,
         "hostOnly": false,
         "httpOnly": false,
         "name": "csid",
@@ -127,7 +127,7 @@
     },
     {
         "domain": ".divar.ir",
-        "expirationDate": 1767004454.219126,
+        "expirationDate": 1767010609.424062,
         "hostOnly": false,
         "httpOnly": false,
         "name": "ff",
@@ -136,12 +136,12 @@
         "secure": false,
         "session": false,
         "storeId": "0",
-        "value": "%7B%22f%22%3A%7B%22foreigner_payment_enabled%22%3Atrue%2C%22enable_filter_post_count_web%22%3Atrue%2C%22enable_non_lazy_image_post_card%22%3Atrue%2C%22device_fp_enable%22%3Atrue%2C%22enable-places-selector-online-search-web%22%3Atrue%7D%2C%22e%22%3A1766921653943%2C%22r%22%3A1767004453943%7D",
+        "value": "%7B%22f%22%3A%7B%22foreigner_payment_enabled%22%3Atrue%2C%22enable_filter_post_count_web%22%3Atrue%2C%22enable_non_lazy_image_post_card%22%3Atrue%2C%22device_fp_enable%22%3Atrue%2C%22enable-places-selector-online-search-web%22%3Atrue%7D%2C%22e%22%3A1766927808184%2C%22r%22%3A1767010608184%7D",
         "id": 10
     },
     {
         "domain": ".divar.ir",
-        "expirationDate": 1801481225.092301,
+        "expirationDate": 1801484209.424461,
         "hostOnly": false,
         "httpOnly": false,
         "name": "multi-city",
@@ -155,7 +155,7 @@
     },
     {
         "domain": ".divar.ir",
-        "expirationDate": 1801481225.092024,
+        "expirationDate": 1801484209.424385,
         "hostOnly": false,
         "httpOnly": false,
         "name": "referrer",
@@ -169,7 +169,7 @@
     },
     {
         "domain": ".divar.ir",
-        "expirationDate": 1801481226.058306,
+        "expirationDate": 1801484210.129913,
         "hostOnly": false,
         "httpOnly": false,
         "name": "theme",
