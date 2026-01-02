@@ -1,10 +1,16 @@
-import {launch} from 'puppeteer';
-import {checkInterval, puppeteerConfig, targetUrl, timeouts, externalRefsUrl} from './config.js';
+import { launch } from 'puppeteer';
+import {
+    checkInterval,
+    puppeteerConfig,
+    targetUrl,
+    timeouts,
+    externalRefsUrl
+} from './config.js';
 import SaleExtractor from './extractors/saleExtractor.js';
 import RentExtractor from './extractors/rentExtractor.js';
 import CookieManager from './cookieManager.js';
-import {sendAdToServer} from "./services/adSender.js";
-import {loadBlacklist} from "./utils/blacklist.js";
+import { sendAdToServer } from './services/adSender.js';
+import { loadBlacklist } from './utils/blacklist.js';
 
 class DivarMonitor {
     constructor() {
@@ -22,130 +28,168 @@ class DivarMonitor {
             saleAds: 0,
             rentAds: 0,
             successfullySent: 0,
-            errors: 0
+            errors: 0,
+            skippedBecauseOfDatabase: 0,
+            skippedBecauseOfBlacklist: 0
         };
     }
 
     async initialize() {
         this.browser = await launch(puppeteerConfig);
         this.mainPage = await this.browser.newPage();
-        
-        // ایجاد نمونه از هر دو Extractor
+
         this.saleExtractor = new SaleExtractor(this.browser);
         this.rentExtractor = new RentExtractor(this.browser);
 
-        // بارگذاری و تنظیم کوکی‌ها
         const cookies = await this.cookieManager.loadCookies();
-        
+
         if (cookies.length > 0) {
             await this.cookieManager.setCookies(this.mainPage, cookies);
-            
-            // رفتن به صفحه اصلی برای تأیید لاگین
+
             await this.mainPage.goto('https://divar.ir', {
                 waitUntil: 'networkidle2',
                 timeout: timeouts.pageLoad
             });
-            
+
             await this.cookieManager.verifyLogin(this.mainPage);
         }
     }
 
+    async delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
     async getAllAdsLinks() {
         try {
-            // 1. دریافت لیست adIdهای قبلی از API
             let existingAdIds = [];
+
             try {
                 const response = await fetch(externalRefsUrl);
                 if (response.ok) {
-                    existingAdIds = await response.json();
+                    const payload = await response.json();
+                    const rawIds = Array.isArray(payload)
+                        ? payload
+                        : Array.isArray(payload?.data)
+                            ? payload.data
+                            : [];
+                    existingAdIds = rawIds.filter(Boolean).map(id => String(id));
                     console.log(`✅ تعداد adIdهای موجود در دیتابیس: ${existingAdIds.length}`);
+                } else {
+                    console.warn(`⚠️  دریافت adIdها ناکام ماند (status: ${response.status})`);
                 }
             } catch (apiError) {
                 console.warn('⚠️  خطا در دریافت لیست adIdهای موجود:', apiError.message);
             }
 
-            // 2. بارگذاری لیست سیاه
-            const blacklist = loadBlacklist();
-            const blacklistedAdIds = blacklist.map(item => item.adId);
+            const blacklist = loadBlacklist() || [];
+            const blacklistedAdIds = blacklist
+                .map(item => item?.adId)
+                .filter(Boolean)
+                .map(id => String(id));
             console.log(`🚫 تعداد آگهی‌های لیست سیاه: ${blacklistedAdIds.length}`);
 
-            // 3. بارگذاری صفحه دیوار
             await this.mainPage.goto(this.targetUrl, {
                 waitUntil: 'networkidle2',
                 timeout: timeouts.pageLoad
             });
 
-            await this.mainPage.waitForSelector('[data-index="0"]', {
-                timeout: timeouts.elementWait
-            });
+            const cardLinkSelector = 'article.kt-post-card a.kt-post-card__action';
 
-            // 4. استخراج لینک‌ها و فیلتر کردن
-            return await this.mainPage.evaluate((existingIds, blacklistedIds) => {
-                const ads = [];
-                let index = 0;
+            try {
+                await this.mainPage.waitForSelector(cardLinkSelector, {
+                    timeout: timeouts.elementWait
+                });
+            } catch {
+                console.warn('⚠️  لینک آگهی اولیه پیدا نشد؛ تلاش مجدد پس از رفرش...');
+                await this.delay(3000);
+                await this.mainPage.reload({
+                    waitUntil: 'networkidle2',
+                    timeout: timeouts.pageLoad
+                });
+                await this.mainPage.waitForSelector(cardLinkSelector, {
+                    timeout: timeouts.elementWait
+                });
+            }
 
-                while (true) {
-                    const dataIndexDiv = document.querySelector(`[data-index="${index}"]`);
+            for (let i = 0; i < 3; i++) {
+                await this.mainPage.evaluate(() => window.scrollBy(0, window.innerHeight));
+                const randomDelay = Math.floor(Math.random() * 2000) + 1500;
+                await this.delay(randomDelay);
+            }
 
-                    if (!dataIndexDiv) break;
+            const {
+                ads,
+                skippedDbCount,
+                skippedBlacklistCount,
+                rawCardCount
+            } = await this.mainPage.evaluate((existingIds, blacklistedIds) => {
+                const existingSet = new Set(existingIds);
+                const blacklistSet = new Set(blacklistedIds);
 
-                    const firstChildDiv = dataIndexDiv.querySelector(':scope > div:first-child');
-                    if (!firstChildDiv) {
-                        index++;
-                        continue;
+                const result = {
+                    ads: [],
+                    skippedDbCount: 0,
+                    skippedBlacklistCount: 0,
+                    rawCardCount: 0
+                };
+
+                const links = Array.from(document.querySelectorAll('article.kt-post-card a.kt-post-card__action'));
+                const seenIds = new Set();
+
+                result.rawCardCount = links.length;
+
+                links.forEach((link, idx) => {
+                    const href = link.getAttribute('href');
+                    if (!href) return;
+
+                    const parts = href.split('/').filter(Boolean);
+                    const adId = parts[parts.length - 1];
+                    if (!adId || seenIds.has(adId)) return;
+                    seenIds.add(adId);
+
+                    if (existingSet.has(adId)) {
+                        result.skippedDbCount++;
+                        return;
                     }
 
-                    const linkElement = firstChildDiv.querySelector('a.kt-post-card__action');
-                    if (!linkElement) {
-                        index++;
-                        continue;
+                    if (blacklistSet.has(adId)) {
+                        result.skippedBlacklistCount++;
+                        return;
                     }
 
-                    const href = linkElement.getAttribute('href');
-                    if (href) {
-                        const urlParts = href.split('/');
-                        const adId = urlParts[urlParts.length - 1];
+                    const cardRoot =
+                        link.closest('article.kt-post-card') ||
+                        link.closest('[data-index]') ||
+                        link;
 
-                        // بررسی وجود در لیست موجود یا لیست سیاه
-                        if (existingIds.includes(adId)) {
-                            console.log(`⏭️  آگهی ${adId} قبلاً ثبت شده است، رد شد`);
-                            index++;
-                            continue;
-                        }
+                    const textSource = cardRoot?.innerText || cardRoot?.textContent || '';
 
-                        if (blacklistedIds.includes(adId)) {
-                            console.log(`🚫 آگهی ${adId} در لیست سیاه است، رد شد`);
-                            index++;
-                            continue;
-                        }
+                    const isRent = /ودیعه|اجاره|رهن/i.test(textSource);
 
-                        // ✅ تغییر: فقط متن همین آگهی را بررسی کن
-                        let adType = 'sale';
-                        const cardText = firstChildDiv.innerText || firstChildDiv.textContent || '';
+                    result.ads.push({
+                        index: idx,
+                        adId,
+                        href,
+                        fullUrl: href.startsWith('http') ? href : `https://divar.ir${href}`,
+                        type: isRent ? 'rent' : 'sale'
+                    });
+                });
 
-                        if (cardText.includes('ودیعه') ||
-                            cardText.includes('اجاره') ||
-                            cardText.includes('رهن')) {
-                            adType = 'rent';
-                        }
-
-                        ads.push({
-                            index: index,
-                            adId: adId,
-                            href: href,
-                            fullUrl: `https://divar.ir${href}`,
-                            type: adType
-                        });
-                    }
-
-                    index++;
-                }
-
-                return ads;
+                return result;
             }, existingAdIds, blacklistedAdIds);
 
+            this.statistics.skippedBecauseOfDatabase += skippedDbCount;
+            this.statistics.skippedBecauseOfBlacklist += skippedBlacklistCount;
+
+            console.log(`📄 تعداد کارت‌های دیده‌شده: ${rawCardCount}`);
+            console.log(`⏭️  تعداد آگهی رد شده به دلیل دیتابیس: ${skippedDbCount}`);
+            console.log(`🚫 تعداد آگهی رد شده به دلیل لیست سیاه: ${skippedBlacklistCount}`);
+            console.log(`✅ تعداد آگهی آماده پردازش: ${ads.length}`);
+
+            return ads;
         } catch (error) {
             this.statistics.errors++;
+            console.error('❌ خطا در getAllAdsLinks:', error.message);
             return [];
         }
     }
@@ -154,45 +198,54 @@ class DivarMonitor {
         this.statistics.totalChecks++;
 
         const adsData = await this.getAllAdsLinks();
-
         this.statistics.totalAdsFound += adsData.length;
+
+        if (adsData.length === 0) {
+            console.log('ℹ️  آگهی جدیدی یافت نشد.');
+            return;
+        }
 
         for (let i = 0; i < adsData.length; i++) {
             const ad = adsData[i];
+            const isLastAd = i === adsData.length - 1;
 
             this.statistics.totalAdsProcessed++;
 
-            let success = false;
+            try {
+                let adData;
 
-            // استفاده از Extractor مناسب
-            if (ad.type === 'sale') {
-                this.statistics.saleAds++;
-                const adData = await this.saleExtractor.processAd(ad.fullUrl);
-                if (! adData) continue;
-                await sendAdToServer(adData);
-            } else {
-                this.statistics.rentAds++;
-                const adData = await this.rentExtractor.processAd(ad.fullUrl);
-                if (! adData) continue;
-                await sendAdToServer(adData);
-            }
+                if (ad.type === 'sale') {
+                    this.statistics.saleAds++;
+                    adData = await this.saleExtractor.processAd(ad.fullUrl);
+                } else {
+                    this.statistics.rentAds++;
+                    adData = await this.rentExtractor.processAd(ad.fullUrl);
+                }
 
-            if (success) {
+                if (!adData) {
+                    console.warn(`⚠️  داده‌ای برای آگهی ${ad.adId} استخراج نشد؛ ارسال انجام نمی‌شود.`);
+                    continue;
+                }
+
+                await sendAdToServer(adData);
                 this.statistics.successfullySent++;
-            } else {
+                console.log(`🚀 آگهی ${ad.adId} (${ad.type}) ارسال شد.`);
+            } catch (error) {
                 this.statistics.errors++;
-            }
-
-            // تأخیر ۵ دقیقه بین پردازش هر آگهی (به جز آخرین آگهی)
-            if (i < adsData.length - 1) {
-                let delay = Math.floor(Math.random() * (timeouts.maxDelayMinutes - timeouts.minDelayMinutes + 1)) + timeouts.minDelayMinutes;
-
-                const delayMs = delay * 60 * 1000;
-
-                console.log(`⏳ صبر ${delay} دقیقه تا پردازش آگهی بعدی...`);
-                await new Promise(resolve => setTimeout(resolve, delayMs));
+                console.error(`❌ خطا در پردازش/ارسال آگهی ${ad.adId}:`, error.message);
+            } finally {
+                if (!isLastAd) {
+                    await this.waitRandomDelay();
+                }
             }
         }
+    }
+
+    async waitRandomDelay() {
+        const minutes = Math.floor(Math.random() * (timeouts.maxDelayMinutes - timeouts.minDelayMinutes + 1)) + timeouts.minDelayMinutes;
+        const delayMs = minutes * 60 * 1000;
+        console.log(`⏳ صبر ${minutes} دقیقه‌ای تا پردازش آگهی بعدی...`);
+        await this.delay(delayMs);
     }
 
     async startMonitoring() {
@@ -210,7 +263,6 @@ class DivarMonitor {
     }
 }
 
-// اجرای برنامه
 (async () => {
     const monitor = new DivarMonitor();
 
@@ -218,12 +270,15 @@ class DivarMonitor {
         await monitor.initialize();
         await monitor.startMonitoring();
 
-        process.on('SIGINT', async () => {
+        const gracefulShutdown = async () => {
             await monitor.close();
             process.exit(0);
-        });
+        };
 
+        process.on('SIGINT', gracefulShutdown);
+        process.on('SIGTERM', gracefulShutdown);
     } catch (error) {
+        console.error('❌ خطای کلی برنامه:', error.message);
         await monitor.close();
         process.exit(1);
     }

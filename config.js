@@ -17,7 +17,7 @@ export const apiConfig = {
     }
 };
 export const puppeteerConfig = {
-    headless: true, // چون داری با سایت حساس کار می‌کنی
+    headless: true,
     executablePath: getChromeExecutablePath(),
     defaultViewport: {
         width: 1920,

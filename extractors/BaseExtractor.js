@@ -3,6 +3,8 @@ import { revealPhoneNumber } from '../utils/contactHelper.js';
 import { convertPersianPriceToNumber } from "../utils/priceUtils.js";
 import { addToBlacklist } from '../utils/blacklist.js';
 
+const MAP_STYLE_PATTERN = 'base-style-light';
+
 export default class BaseExtractor {
     constructor(browser) {
         this.browser = browser;
@@ -194,6 +196,8 @@ export default class BaseExtractor {
 
             commonData.cityId = cityId;
 
+            // commonData.geo = await this.extractGeoByOpeningMap(page);
+
             return { page, data: commonData };
 
         } catch (error) {
@@ -202,5 +206,33 @@ export default class BaseExtractor {
             await page.close();
             throw error;
         }
+    }
+
+    async extractGeoByOpeningMap(page) {
+        try {
+            await page.waitForSelector('img[alt="موقعیت مکانی"]', { timeout: timeouts.elementWait });
+        } catch {
+            return null;
+        }
+
+        const mapStyleResponsePromise = page.waitForResponse(
+            (response) =>
+                response.url().includes(MAP_STYLE_PATTERN) && response.request().method() === 'GET',
+            { timeout: timeouts.elementWait }
+        ).catch(() => null);
+
+        await page.click('img[alt="موقعیت مکانی"]');
+
+        const styleJson = await mapStyleResponsePromise?.then((res) => res.json()).catch(() => null);
+        if (!styleJson?.center || styleJson.center.length < 2) {
+            return null;
+        }
+
+        const [lng, lat] = styleJson.center;
+        if (typeof lat !== 'number' || typeof lng !== 'number') {
+            return null;
+        }
+
+        return { latitude: lat, longitude: lng };
     }
 }
