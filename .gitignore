@@ -16,3 +16,4 @@ yarn-error.log
 
 # config files
 cookies.json
+data/blacklisted-ads.json
