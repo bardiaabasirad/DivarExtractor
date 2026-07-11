@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import { randomDelay } from './utils/randomDelay.js';
 
 class CookieManager {
     constructor(cookieFilePath = './cookies.json') {
@@ -74,6 +75,8 @@ class CookieManager {
                 visible: true,
                 timeout: 3000
             });
+
+            await randomDelay(1000, 3000);
 
             // کمی صبر برای اطمینان از رندر کامل (جایگزین waitForTimeout)
             await new Promise(resolve => setTimeout(resolve, 500));

@@ -1,4 +1,4 @@
-import puppeteer, { launch } from 'puppeteer';
+import { launch } from 'puppeteer';
 import {
     checkInterval,
     puppeteerConfig,
@@ -11,6 +11,7 @@ import RentExtractor from './extractors/rentExtractor.js';
 import CookieManager from './cookieManager.js';
 import { sendAdToServer } from './services/adSender.js';
 import { loadBlacklist } from './utils/blacklist.js';
+import { randomDelay } from './utils/randomDelay.js';
 
 class DivarMonitor {
     constructor() {
@@ -205,6 +206,8 @@ class DivarMonitor {
 
     async checkForNewAds() {
         this.statistics.totalChecks++;
+
+        await randomDelay(1000, 3000);
 
         const adsData = await this.getAllAdsLinks();
         this.statistics.totalAdsFound += adsData.length;
