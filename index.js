@@ -1,4 +1,4 @@
-import { launch } from 'puppeteer';
+import puppeteer, { launch } from 'puppeteer';
 import {
     checkInterval,
     puppeteerConfig,
@@ -65,20 +65,27 @@ class DivarMonitor {
 
             try {
                 const response = await fetch(externalRefsUrl);
+
                 if (response.ok) {
                     const payload = await response.json();
-                    const rawIds = Array.isArray(payload)
-                        ? payload
-                        : Array.isArray(payload?.data)
-                            ? payload.data
+
+                    const source = payload?.data ?? payload;
+
+                    const rawIds = Array.isArray(source)
+                        ? source
+                        : source && typeof source === 'object'
+                            ? Object.values(source)
                             : [];
+
                     existingAdIds = rawIds.filter(Boolean).map(id => String(id));
-                    console.log(`✅ تعداد adIdهای موجود در دیتابیس: ${existingAdIds.length}`);
+
+                    console.log(`✅ Number of adIds found in the database: ${existingAdIds.length}`);
                 } else {
-                    console.warn(`⚠️  دریافت adIdها ناکام ماند (status: ${response.status})`);
+                    console.warn(`⚠️  Failed to fetch adIds (status: ${response.status})`);
                 }
+
             } catch (apiError) {
-                console.warn('⚠️  خطا در دریافت لیست adIdهای موجود:', apiError.message);
+                console.warn('⚠️  Error fetching the list of existing adIds:', apiError.message);
             }
 
             const blacklist = loadBlacklist() || [];
@@ -86,7 +93,7 @@ class DivarMonitor {
                 .map(item => item?.adId)
                 .filter(Boolean)
                 .map(id => String(id));
-            console.log(`🚫 تعداد آگهی‌های لیست سیاه: ${blacklistedAdIds.length}`);
+            console.log(`🚫 Number of blacklisted ads: ${blacklistedAdIds.length}`);
 
             await this.mainPage.goto(this.targetUrl, {
                 waitUntil: 'networkidle2',
@@ -100,7 +107,7 @@ class DivarMonitor {
                     timeout: timeouts.elementWait
                 });
             } catch {
-                console.warn('⚠️  لینک آگهی اولیه پیدا نشد؛ تلاش مجدد پس از رفرش...');
+                console.warn('⚠️  Initial ad link not found; retrying after refresh...');
                 await this.delay(3000);
                 await this.mainPage.reload({
                     waitUntil: 'networkidle2',
@@ -142,8 +149,10 @@ class DivarMonitor {
                     const href = link.getAttribute('href');
                     if (!href) return;
 
-                    const parts = href.split('/').filter(Boolean);
-                    const adId = parts[parts.length - 1];
+                    const normalizedUrl = new URL(href, 'https://divar.ir');
+                    const pathParts = normalizedUrl.pathname.split('/').filter(Boolean);
+                    const adId = pathParts[pathParts.length - 1];
+
                     if (!adId || seenIds.has(adId)) return;
                     seenIds.add(adId);
 
@@ -170,7 +179,7 @@ class DivarMonitor {
                         index: idx,
                         adId,
                         href,
-                        fullUrl: href.startsWith('http') ? href : `https://divar.ir${href}`,
+                        fullUrl: normalizedUrl.href,
                         type: isRent ? 'rent' : 'sale'
                     });
                 });
@@ -181,15 +190,15 @@ class DivarMonitor {
             this.statistics.skippedBecauseOfDatabase += skippedDbCount;
             this.statistics.skippedBecauseOfBlacklist += skippedBlacklistCount;
 
-            console.log(`📄 تعداد کارت‌های دیده‌شده: ${rawCardCount}`);
-            console.log(`⏭️  تعداد آگهی رد شده به دلیل دیتابیس: ${skippedDbCount}`);
-            console.log(`🚫 تعداد آگهی رد شده به دلیل لیست سیاه: ${skippedBlacklistCount}`);
-            console.log(`✅ تعداد آگهی آماده پردازش: ${ads.length}`);
+            console.log(`📄 Number of cards found: ${rawCardCount}`);
+            console.log(`⏭️  Number of ads skipped due to database match: ${skippedDbCount}`);
+            console.log(`🚫 Number of ads skipped due to blacklist: ${skippedBlacklistCount}`);
+            console.log(`✅ Number of ads ready for processing: ${ads.length}`);
 
             return ads;
         } catch (error) {
             this.statistics.errors++;
-            console.error('❌ خطا در getAllAdsLinks:', error.message);
+            console.error('❌ Error in getAllAdsLinks:', error.message);
             return [];
         }
     }
@@ -201,7 +210,7 @@ class DivarMonitor {
         this.statistics.totalAdsFound += adsData.length;
 
         if (adsData.length === 0) {
-            console.log('ℹ️  آگهی جدیدی یافت نشد.');
+            console.log('ℹ️  No new ads found.');
             return;
         }
 
@@ -223,16 +232,16 @@ class DivarMonitor {
                 }
 
                 if (!adData) {
-                    console.warn(`⚠️  داده‌ای برای آگهی ${ad.adId} استخراج نشد؛ ارسال انجام نمی‌شود.`);
+                    console.warn(`⚠️  No data extracted for ad ${ad.adId}; skipping submission.`);
                     continue;
                 }
 
                 await sendAdToServer(adData);
                 this.statistics.successfullySent++;
-                console.log(`🚀 آگهی ${ad.adId} (${ad.type}) ارسال شد.`);
+                console.log(`🚀 Ad ${ad.adId} (${ad.type}) submitted.`);
             } catch (error) {
                 this.statistics.errors++;
-                console.error(`❌ خطا در پردازش/ارسال آگهی ${ad.adId}:`, error.message);
+                console.error(`❌ Error processing/submitting ad ${ad.adId}:`, error.message);
             } finally {
                 if (!isLastAd) {
                     await this.waitRandomDelay();
@@ -242,9 +251,9 @@ class DivarMonitor {
     }
 
     async waitRandomDelay() {
-        const minutes = Math.floor(Math.random() * (timeouts.maxDelayMinutes - timeouts.minDelayMinutes + 1)) + timeouts.minDelayMinutes;
-        const delayMs = minutes * 60 * 1000;
-        console.log(`⏳ صبر ${minutes} دقیقه‌ای تا پردازش آگهی بعدی...`);
+        const seconds = Math.floor(Math.random() * (timeouts.maxDelay - timeouts.minDelay + 1)) + timeouts.minDelay;
+        const delayMs = seconds * 1000;
+        console.log(`⏳ Next ad processing in ${seconds} seconds...`);
         await this.delay(delayMs);
     }
 
@@ -278,7 +287,7 @@ class DivarMonitor {
         process.on('SIGINT', gracefulShutdown);
         process.on('SIGTERM', gracefulShutdown);
     } catch (error) {
-        console.error('❌ خطای کلی برنامه:', error.message);
+        console.error('❌ General application error:', error.message);
         await monitor.close();
         process.exit(1);
     }

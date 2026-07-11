@@ -1,5 +1,6 @@
-import {convertPersianPriceToNumber} from '../utils/priceUtils.js';
+import { convertPersianPriceToNumber } from '../utils/priceUtils.js';
 import BaseExtractor from "./BaseExtractor.js";
+import { randomDelay } from '../utils/randomDelay.js';
 
 class RentExtractor extends BaseExtractor {
 
@@ -92,14 +93,19 @@ class RentExtractor extends BaseExtractor {
                 data.monthlyRent = convertPersianPriceToNumber(data.monthlyRent);
             }
 
+            // ⏱️ تاخیر قبل از بستن تب (شبیه‌سازی خواندن و بررسی داده‌ها)
+            await randomDelay(1000, 3000);
+
             await page.close();
 
             return data;
 
         } catch (error) {
+            // ⏱️ تاخیر قبل از بستن تب در مسیر خطا
+            await randomDelay(1000, 3000);
+
             await page.close();
             console.error('❌ خطا در استخراج اطلاعات اجاره:', error.message);
-            console.error(error.stack);
             return false;
         }
     }

@@ -1,5 +1,6 @@
 import BaseExtractor from './BaseExtractor.js';
 import { convertPersianPriceToNumber } from '../utils/priceUtils.js';
+import { randomDelay } from '../utils/randomDelay.js';
 
 class SaleExtractor extends BaseExtractor {
 
@@ -41,11 +42,17 @@ class SaleExtractor extends BaseExtractor {
                 : null;
             data.floor = convertPersianPriceToNumber(priceData.floor);
 
+            // ⏱️ تاخیر قبل از بستن تب (شبیه‌سازی خواندن و بررسی داده‌ها)
+            await randomDelay(1000, 3000);
+
             await page.close();
 
             return data;
 
         } catch (error) {
+            // ⏱️ تاخیر قبل از بستن تب در مسیر خطا
+            await randomDelay(1000, 3000);
+
             await page.close();
             console.error('❌ خطا در استخراج اطلاعات فروش:', error.message);
             return false;

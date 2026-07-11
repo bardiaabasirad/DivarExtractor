@@ -12,18 +12,18 @@ class CookieManager {
             
         } catch (error) {
             if (error.code === 'ENOENT') {
-                console.warn('⚠️  فایل cookies.json یافت نشد');
+                console.warn('⚠️  cookies.json file not found');
                 return [];
             }
             
-            console.error('❌ خطا در خواندن کوکی‌ها:', error.message);
+            console.error('❌ Error reading cookies:', error.message);
             return [];
         }
     }
 
     async setCookies(page, cookies) {
         if (!cookies || cookies.length === 0) {
-            console.log('ℹ️  هیچ کوکی‌ای برای تنظیم وجود ندارد');
+            console.log('ℹ️  No cookies to set');
             return false;
         }
 
@@ -37,11 +37,11 @@ class CookieManager {
             });
 
             await page.setCookie(...processedCookies);
-            console.log(`✅ ${processedCookies.length} کوکی با موفقیت تنظیم شد`);
+            console.log(`✅ ${processedCookies.length} cookies set successfully`);
             return true;
             
         } catch (error) {
-            console.error('❌ خطا در تنظیم کوکی‌ها:', error.message);
+            console.error('❌ Error setting cookies:', error.message);
             return false;
         }
     }
@@ -55,11 +55,11 @@ class CookieManager {
                 'utf-8'
             );
             
-            console.log(`✅ ${cookies.length} کوکی ذخیره شد`);
+            console.log(`✅ ${cookies.length} cookies saved`);
             return true;
             
         } catch (error) {
-            console.error('❌ خطا در ذخیره کوکی‌ها:', error.message);
+            console.error('❌ Error saving cookies:', error.message);
             return false;
         }
     }
@@ -109,15 +109,15 @@ class CookieManager {
             await new Promise(resolve => setTimeout(resolve, 300));
 
             if (loginStatus.isLoggedIn) {
-                console.log('✅ لاگین با موفقیت تأیید شد -', loginStatus.reason);
+                console.log('✅ Login verified successfully -', loginStatus.reason);
             } else {
-                console.log('⚠️  کاربر لاگین نیست -', loginStatus.reason);
+                console.log('⚠️  User is not logged in -', loginStatus.reason);
             }
 
             return loginStatus.isLoggedIn;
             
         } catch (error) {
-            console.error('❌ خطا در تأیید لاگین:', error.message);
+            console.error('❌ Error verifying login:', error.message);
             
             // در صورت خطا، سعی در بستن منو
             try {

@@ -1,9 +1,9 @@
 import { apiConfig } from '../config.js';
 
 export async function sendAdToServer(data) {
-    console.log('\n📤 در حال ارسال به سرور...');
+    console.log('\n📤 Sending to server...');
 
-    console.log('data', data);
+    console.log('Data:', data);
 
     try {
         const response = await fetch(apiConfig.endpoint, {
@@ -16,11 +16,11 @@ export async function sendAdToServer(data) {
             throw new Error(`${response.status} ${response.statusText}`);
         }
 
-        console.log('✅ ارسال موفق');
+        console.log('✅ Sent successfully');
         return true;
 
     } catch (error) {
-        console.error('❌ خطا در ارسال به سرور:', error.message);
+        console.error('❌ Error sending to server:', error.message);
         return false;
     }
 }

@@ -1,3 +1,6 @@
+import { getChromeExecutablePath } from './utils/chromePath.js';
+import path from 'path';
+
 // Khorramabad
 // export const targetUrl = 'https://divar.ir/s/khorramabad/real-estate';
 // export const cityId = 9;
@@ -6,7 +9,6 @@
 export const targetUrl = 'https://divar.ir/s/nurabad/real-estate';
 export const cityId = 21;
 
-import { getChromeExecutablePath } from './utils/chromePath.js';
 export const externalRefsUrl = 'https://malko.ir/external-refs';
 export const checkInterval = 60000;
 export const apiConfig = {
@@ -16,23 +18,24 @@ export const apiConfig = {
         'Content-Type': 'application/json',
     }
 };
+
 export const puppeteerConfig = {
-    headless: true,
+    headless: false,
     executablePath: getChromeExecutablePath(),
-    defaultViewport: {
-        width: 1920,
-        height: 1080
-    },
+    defaultViewport: null,
+    userDataDir: path.resolve('./chrome-profile'),
     args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
-        '--disable-blink-features=AutomationControlled'
+        '--disable-blink-features=AutomationControlled',
+        '--start-maximized'
     ]
 };
+
 export const timeouts = {
     pageLoad: 30000,
     elementWait: 10000,
-    minDelayMinutes: 5,
-    maxDelayMinutes: 15,
+    minDelay: 40,
+    maxDelay: 180,
 };

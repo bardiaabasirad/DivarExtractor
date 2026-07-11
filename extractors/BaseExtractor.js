@@ -1,7 +1,9 @@
-import {cityId, timeouts} from '../config.js';
+import { cityId, timeouts } from '../config.js';
 import { revealPhoneNumber } from '../utils/contactHelper.js';
 import { convertPersianPriceToNumber } from "../utils/priceUtils.js";
 import { addToBlacklist } from '../utils/blacklist.js';
+import { humanScroll } from '../utils/humanScroll.js';
+import { randomDelay } from '../utils/randomDelay.js';
 
 const MAP_STYLE_PATTERN = 'base-style-light';
 
@@ -19,7 +21,15 @@ export default class BaseExtractor {
     }
 
     extractAdId(adUrl) {
-        return adUrl.split('/').pop();
+        try {
+            const url = new URL(adUrl, 'https://divar.ir');
+            const segments = url.pathname.split('/').filter(Boolean);
+
+            return segments.at(-1) || null;
+        } catch (error) {
+            console.error('Failed to extract adId from URL:', adUrl, error);
+            return null;
+        }
     }
 
     /**
@@ -41,17 +51,31 @@ export default class BaseExtractor {
             // کلیک روی اطلاعات تماس
             const { status } = await revealPhoneNumber(page);
 
+            if (status === 'anonymous_contact') {
+                console.log('🚫 "Anonymous Call" button found - ad added to blacklist');
+                addToBlacklist(adId, 'anonymous_contact');
+                await humanScroll(page);
+                await randomDelay(1000, 3000);
+                await page.close();
+                return null;
+            }
+
             if (status === 'phone_hidden') {
-                console.log('❌ شماره تلفن این آگهی مخفی است - رد شد');
+                console.log('❌ This ad phone number is hidden - skipped');
 
                 // افزودن به لیست سیاه
                 addToBlacklist(adId, 'phone_hidden');
+
+                await humanScroll(page);
+
+                // ⏱️ تاخیر قبل از بستن تب (جلوگیری از بستن ناگهانی)
+                await randomDelay(1000, 3000);
 
                 await page.close();
                 return null;
             }
 
-            console.log('✅ شماره تلفن یافت شد');
+            console.log('✅ Phone number found');
 
             const commonData = await page.evaluate((adType, adId, adUrl) => {
                 try {
@@ -67,38 +91,59 @@ export default class BaseExtractor {
                         ? phoneLink.getAttribute('href').replace('tel:', '')
                         : null;
 
-                    // زمان و موقعیت
-                    const locationElement = document.querySelector('h1 + div.kt-page-title__subtitle');
-                    if (locationElement) {
-                        const fullText = locationElement.textContent.trim();
+                    // ۱. انتخاب المان با استفاده از کلاس دقیق جدید
+                    const titleElement = document.querySelector('.kt-info-row__title');
+
+                    if (titleElement) {
+                        const fullText = titleElement.textContent.trim();
+
+                        // ۲. تقسیم متن بر اساس کلمه " در " برای جدا کردن زمان از مکان
                         const parts = fullText.split(' در ');
-                        data.timeAgo = parts[0]?.trim();
-                        data.location = parts[1]?.trim();
+
+                        if (parts.length > 1) {
+                            data.timeAgo = parts[0].trim(); // "۷ ساعت پیش"
+
+                            // ۳. حالا بخش دوم یعنی "نورآباد، خ پاسداران ۸" را داریم
+                            const locationPart = parts[1];
+
+                            // استخراج بخش بعد از ویرگول (یعنی دقیقاً "خ پاسداران ۸")
+                            if (locationPart.includes('،')) {
+                                const subParts = locationPart.split('،');
+                                data.location = subParts[1]?.trim(); // "خ پاسداران ۸"
+                                data.city = subParts[0]?.trim();     // "نورآباد"
+                            } else {
+                                data.location = locationPart.trim();
+                            }
+                        }
                     }
 
                     // جدول اصلی
                     const table = document.querySelector('table.kt-group-row');
                     if (table) {
                         const headers = [...table.querySelectorAll('thead th')].map(th => th.textContent.trim());
-                        const values  = [...table.querySelectorAll('tbody td')].map(td => td.textContent.trim());
+                        const values = [...table.querySelectorAll('tbody td')].map(td => td.textContent.trim());
 
                         const getValue = key => {
                             const index = headers.indexOf(key);
                             return index >= 0 ? values[index] : null;
                         };
 
-                        data.area      = getValue('متراژ');
+                        data.area = getValue('متراژ');
                         data.buildYear = getValue('ساخت');
-                        data.rooms     = getValue('اتاق');
+                        data.rooms = getValue('اتاق');
                     }
 
                     // استخراج متراژ از section (اگر در جدول نبود)
                     if (!data.area) {
-                        const allSections = document.querySelectorAll('section');
-                        allSections.forEach(section => {
-                            const title = section.querySelector('p.kt-base-row__title');
+                        const rows = document.querySelectorAll('.kt-base-row');
+
+                        rows.forEach(row => {
+                            const title = row.querySelector('.kt-base-row__title');
+
                             if (title && title.textContent.trim() === 'متراژ') {
-                                const value = section.querySelector('p.kt-base-row__title + p');
+                                const value = row.querySelector(
+                                    '.kt-unexpandable-row__value, .kt-base-row__end p'
+                                );
                                 data.area = value ? value.textContent.trim() : null;
                             }
                         });
@@ -172,11 +217,11 @@ export default class BaseExtractor {
                         });
                     }
 
-                    console.log('✅ استخراج داده‌ها کامل شد');
+                    console.log('✅ Data extraction completed');
                     return data;
 
                 } catch (error) {
-                    console.error('❌ خطا در evaluate:', error.message);
+                    console.error('❌ Error in evaluate:', error.message);
                     throw error;
                 }
             }, this.getAdType(), adId, adUrl);
@@ -201,8 +246,12 @@ export default class BaseExtractor {
             return { page, data: commonData };
 
         } catch (error) {
-            console.error('❌ خطا در processCommon:', error.message);
-            console.error(error.stack);
+            console.error('❌ Error in processCommon:', error.message);
+
+            await humanScroll(page);
+
+            await randomDelay(1000, 3000);
+
             await page.close();
             throw error;
         }
