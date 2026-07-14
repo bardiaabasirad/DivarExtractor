@@ -3,8 +3,6 @@ import { apiConfig } from '../config.js';
 export async function sendAdToServer(data) {
     console.log('\n📤 Sending to server...');
 
-    console.log('Data:', data);
-
     try {
         const response = await fetch(apiConfig.endpoint, {
             method: apiConfig.method || 'POST',

@@ -12,14 +12,6 @@ export default class BaseExtractor {
         this.browser = browser;
     }
 
-    getAdType() {
-        throw new Error('getAdType() must be implemented');
-    }
-
-    getLogTitle() {
-        throw new Error('getLogTitle() must be implemented');
-    }
-
     extractAdId(adUrl) {
         try {
             const url = new URL(adUrl, 'https://divar.ir');
@@ -77,9 +69,12 @@ export default class BaseExtractor {
 
             console.log('✅ Phone number found');
 
-            const commonData = await page.evaluate((adType, adId, adUrl) => {
+            await humanScroll(page);
+            await randomDelay(1000, 3000);
+
+            const commonData = await page.evaluate((adId, adUrl) => {
                 try {
-                    const data = { adType, adId, adUrl };
+                    const data = { adId, adUrl };
 
                     // عنوان
                     const title = document.querySelector('h1');
@@ -128,7 +123,7 @@ export default class BaseExtractor {
                             return index >= 0 ? values[index] : null;
                         };
 
-                        data.area = getValue('متراژ');
+                        data.area = getValue('متراژ') ?? getValue('متراژ زمین');
                         data.buildYear = getValue('ساخت');
                         data.rooms = getValue('اتاق');
                     }
@@ -139,8 +134,9 @@ export default class BaseExtractor {
 
                         rows.forEach(row => {
                             const title = row.querySelector('.kt-base-row__title');
+                            const titleText = title ? title.textContent.trim() : '';
 
-                            if (title && title.textContent.trim() === 'متراژ') {
+                            if (titleText === 'متراژ' || titleText === 'متراژ زمین') {
                                 const value = row.querySelector(
                                     '.kt-unexpandable-row__value, .kt-base-row__end p'
                                 );
@@ -198,6 +194,23 @@ export default class BaseExtractor {
                         ? breadcrumbLinks[breadcrumbLinks.length - 1].textContent.trim()
                         : null;
 
+                    // تشخیص نوع آگهی (اجاره/فروش) بر اساس breadcrumbs — مرجع اصلی تشخیص
+                    const breadcrumbItems = document.querySelectorAll('.kt-breadcrumbs__item');
+                    let isRentAd = false;
+
+                    breadcrumbItems.forEach(item => {
+                        const link = item.querySelector('a');
+                        const href = link?.getAttribute('href') || '';
+                        const text = item.textContent || '';
+
+                        // مسیر /rent- در href یا واژهٔ «اجاره» (شامل «اجارهٔ») در متن
+                        if (href.includes('/rent-') || text.includes('اجاره')) {
+                            isRentAd = true;
+                        }
+                    });
+
+                    data.adType = isRentAd ? 'rent' : 'sell';
+
                     // استخراج تصاویر
                     data.images = [];
                     const imageElements = document.querySelectorAll('img[src*="divarcdn.com"]');
@@ -224,7 +237,7 @@ export default class BaseExtractor {
                     console.error('❌ Error in evaluate:', error.message);
                     throw error;
                 }
-            }, this.getAdType(), adId, adUrl);
+            }, adId, adUrl);
 
             // تبدیل مقادیر عددی در محیط Node.js
             if (commonData.area) {
@@ -284,4 +297,81 @@ export default class BaseExtractor {
 
         return { latitude: lat, longitude: lng };
     }
+
+    async processAd(adUrl) {
+        const result = await this.processCommon(adUrl);
+        if (!result) return false;
+
+        const { page, data } = result;
+
+        try {
+            if (data.adType === 'rent') {
+                await this.extractRentPrices(page, data);
+            } else {
+                await this.extractSalePrices(page, data);
+            }
+
+            await randomDelay(1000, 3000);
+            await page.close();
+            return data;
+        } catch (error) {
+            await randomDelay(1000, 3000);
+            await page.close();
+            console.error('❌ خطا در استخراج قیمت:', error.message);
+            return false;
+        }
+    }
+
+    async extractRentPrices(page, data) {
+        const rentInfo = await page.evaluate(() => {
+            const rentData = { deposit: null, monthlyRent: null };
+
+            document.querySelectorAll('.kt-unexpandable-row').forEach(row => {
+                const title = row.querySelector('.kt-base-row__title')?.textContent.trim();
+                const value = row.querySelector('.kt-unexpandable-row__value')?.textContent.trim();
+                if (!title || !value) return;
+                if (title === 'ودیعه') rentData.deposit = value;
+                else if (title.includes('اجاره') && title.includes('ماهانه')) rentData.monthlyRent = value;
+            });
+
+            if (!rentData.deposit || !rentData.monthlyRent) {
+                document.querySelectorAll('table.kt-group-row').forEach(table => {
+                    const headers = [...table.querySelectorAll('thead th')].map(th => th.textContent.trim());
+                    if (headers.some(h => h.includes('ودیعه')) && headers.some(h => h.includes('اجاره'))) {
+                        const values = [...table.querySelectorAll('tbody td')].map(td => td.textContent.trim());
+                        const di = headers.findIndex(h => h.includes('ودیعه'));
+                        const ri = headers.findIndex(h => h.includes('اجاره'));
+                        if (di >= 0 && values[di]) rentData.deposit = values[di];
+                        if (ri >= 0 && values[ri]) rentData.monthlyRent = values[ri];
+                    }
+                });
+            }
+            return rentData;
+        });
+
+        data.deposit = rentInfo.deposit ? convertPersianPriceToNumber(rentInfo.deposit) : null;
+        data.monthlyRent = rentInfo.monthlyRent ? convertPersianPriceToNumber(rentInfo.monthlyRent) : null;
+    }
+
+    async extractSalePrices(page, data) {
+        const priceData = await page.evaluate(() => {
+            const rows = document.querySelectorAll('.kt-unexpandable-row');
+            const getValue = label => {
+                const row = [...rows].find(r =>
+                    r.querySelector('.kt-unexpandable-row__title')?.textContent.trim() === label
+                );
+                return row?.querySelector('.kt-unexpandable-row__value')?.textContent.trim() ?? null;
+            };
+            return {
+                // «قیمت ملک» برای زمین/کلنگی، «قیمت کل» برای آپارتمان
+                totalPrice: getValue('قیمت کل') ?? getValue('قیمت ملک'),
+                floor: getValue('طبقه'),
+            };
+        });
+
+        data.totalPrice = convertPersianPriceToNumber(priceData.totalPrice);
+        data.pricePerMeter = data.area ? Math.floor(data.totalPrice / Number(data.area)) : null;
+        data.floor = convertPersianPriceToNumber(priceData.floor);
+    }
+
 }

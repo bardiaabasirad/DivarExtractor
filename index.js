@@ -6,8 +6,7 @@ import {
     timeouts,
     externalRefsUrl
 } from './config.js';
-import SaleExtractor from './extractors/saleExtractor.js';
-import RentExtractor from './extractors/rentExtractor.js';
+import BaseExtractor from './extractors/BaseExtractor.js';
 import CookieManager from './cookieManager.js';
 import { sendAdToServer } from './services/adSender.js';
 import { loadBlacklist } from './utils/blacklist.js';
@@ -19,8 +18,6 @@ class DivarMonitor {
         this.interval = checkInterval;
         this.browser = null;
         this.mainPage = null;
-        this.saleExtractor = null;
-        this.rentExtractor = null;
         this.cookieManager = new CookieManager('./cookies.json');
         this.statistics = {
             totalChecks: 0,
@@ -39,8 +36,7 @@ class DivarMonitor {
         this.browser = await launch(puppeteerConfig);
         this.mainPage = await this.browser.newPage();
 
-        this.saleExtractor = new SaleExtractor(this.browser);
-        this.rentExtractor = new RentExtractor(this.browser);
+        this.extractor = new BaseExtractor(this.browser);
 
         const cookies = await this.cookieManager.loadCookies();
 
@@ -174,14 +170,11 @@ class DivarMonitor {
 
                     const textSource = cardRoot?.innerText || cardRoot?.textContent || '';
 
-                    const isRent = /ودیعه|اجاره|رهن/i.test(textSource);
-
                     result.ads.push({
                         index: idx,
                         adId,
                         href,
-                        fullUrl: normalizedUrl.href,
-                        type: isRent ? 'rent' : 'sale'
+                        fullUrl: normalizedUrl.href
                     });
                 });
 
@@ -224,24 +217,19 @@ class DivarMonitor {
             this.statistics.totalAdsProcessed++;
 
             try {
-                let adData;
-
-                if (ad.type === 'sale') {
-                    this.statistics.saleAds++;
-                    adData = await this.saleExtractor.processAd(ad.fullUrl);
-                } else {
-                    this.statistics.rentAds++;
-                    adData = await this.rentExtractor.processAd(ad.fullUrl);
-                }
+                const adData = await this.extractor.processAd(ad.fullUrl);
 
                 if (!adData) {
                     console.warn(`⚠️  No data extracted for ad ${ad.adId}; skipping submission.`);
                     continue;
                 }
 
+                if (adData.adType === 'rent') this.statistics.rentAds++;
+                else this.statistics.saleAds++;
+
                 await sendAdToServer(adData);
                 this.statistics.successfullySent++;
-                console.log(`🚀 Ad ${ad.adId} (${ad.type}) submitted.`);
+                console.log(`🚀 Ad ${ad.adId} (${adData.adType}) submitted.`);
             } catch (error) {
                 this.statistics.errors++;
                 console.error(`❌ Error processing/submitting ad ${ad.adId}:`, error.message);
