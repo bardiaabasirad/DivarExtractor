@@ -1,8 +1,8 @@
 {
   "name": "divar-scraper",
   "version": "1.0.0",
-  "description": "سیستم مانیتورینگ و استخراج آگهی‌های دیوار",
-  "main": "main.js",
+  "description": "سیستم مانیتورینگ و استخراج آگهی‌های املاک دیوار",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,7 +12,7 @@
   "type": "module",
   "dependencies": {
     "puppeteer": "^24.34.0",
-    "axios": "^1.6.0"
+    "axios": "1.15.2"
   },
   "devDependencies": {
     "nodemon": "^3.0.0"

@@ -12,7 +12,7 @@ export function getChromeExecutablePath() {
     }
 
     if (platform === 'linux') {
-        return '/usr/bin/google-chrome';
+        return undefined;
     }
 
     throw new Error('❌ Chrome executable path not found for this OS');

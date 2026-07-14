@@ -67,66 +67,55 @@ class CookieManager {
 
     async verifyLogin(page) {
         try {
-            // کلیک روی دکمه "دیوار من"
-            await page.click('button.kt-nav-button:has(.kt-icon-person)');
-            
-            // صبر کردن تا منوی dropdown باز شود
+            const iconSelector = 'button.kt-nav-button .kt-icon-person';
+            await page.waitForSelector(iconSelector, {
+                visible: true,
+                timeout: 10000
+            });
+
+            // به‌دست آوردن handle دکمه‌ی والد و کلیک واقعی
+            const iconHandle = await page.$(iconSelector);
+            const buttonHandle = await iconHandle.evaluateHandle(
+                el => el.closest('button.kt-nav-button')
+            );
+
+            // اسکرول تا دیده شود و سپس کلیک واقعی ماوس
+            await buttonHandle.asElement().scrollIntoViewIfNeeded?.();
+            await buttonHandle.asElement().click();
+
+            // صبر برای باز شدن منو
             await page.waitForSelector('.kt-dropdown-menu__menu--open', {
                 visible: true,
-                timeout: 3000
+                timeout: 5000
             });
 
-            await randomDelay(1000, 3000);
-
-            // کمی صبر برای اطمینان از رندر کامل (جایگزین waitForTimeout)
             await new Promise(resolve => setTimeout(resolve, 500));
 
-            // بررسی وجود دکمه ورود یا خروج
             const loginStatus = await page.evaluate(() => {
                 const menu = document.querySelector('.kt-dropdown-menu__menu--open');
-                if (!menu) return null;
+                if (!menu) return { isLoggedIn: false, reason: 'منو باز نشد' };
 
-                // بررسی دکمه ورود (لاگین نیست)
-                const loginButton = menu.querySelector('.kt-icon-log-in-o');
-                if (loginButton) {
-                    return { isLoggedIn: false, reason: 'دکمه ورود پیدا شد' };
-                }
-
-                // بررسی دکمه خروج (لاگین است)
-                const logoutButton = menu.querySelector('.kt-icon-log-out-o');
-                if (logoutButton) {
-                    return { isLoggedIn: true, reason: 'دکمه خروج پیدا شد' };
-                }
-
-                // بررسی اضافی: وجود لینک "آگهی‌های من"
-                const myPostsLink = menu.querySelector('a[href="/my-divar/my-posts"]');
-                if (myPostsLink) {
-                    return { isLoggedIn: true, reason: 'لینک آگهی‌های من پیدا شد' };
-                }
-
-                return { isLoggedIn: false, reason: 'هیچ نشانه‌ای از لاگین پیدا نشد' };
+                if (menu.querySelector('.kt-icon-log-in-o'))
+                    return { isLoggedIn: false, reason: 'Login button found' };
+                if (menu.querySelector('.kt-icon-log-out-o'))
+                    return { isLoggedIn: true, reason: 'Logout button found' };
+                if (menu.querySelector('a[href="/my-divar/my-posts"]'))
+                    return { isLoggedIn: true, reason: 'My posts link found' };
+                return { isLoggedIn: false, reason: 'No sign of login found' };
             });
 
-            // بستن منو با کلیک در خارج از آن
             await page.click('body');
             await new Promise(resolve => setTimeout(resolve, 300));
 
-            if (loginStatus.isLoggedIn) {
-                console.log('✅ Login verified successfully -', loginStatus.reason);
-            } else {
-                console.log('⚠️  User is not logged in -', loginStatus.reason);
-            }
+            console.log(loginStatus.isLoggedIn
+                ? `✅ Login verified - ${loginStatus.reason}`
+                : `⚠️  Not logged in - ${loginStatus.reason}`);
 
             return loginStatus.isLoggedIn;
-            
+
         } catch (error) {
             console.error('❌ Error verifying login:', error.message);
-            
-            // در صورت خطا، سعی در بستن منو
-            try {
-                await page.click('body');
-            } catch (e) {}
-            
+            try { await page.click('body'); } catch (e) {}
             return false;
         }
     }
