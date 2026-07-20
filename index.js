@@ -1,16 +1,19 @@
-import { launch } from 'puppeteer';
-import {
+const { launch } = require("puppeteer");
+
+const {
     checkInterval,
     puppeteerConfig,
     targetUrl,
     timeouts,
-    externalRefsUrl
-} from './config.js';
-import BaseExtractor from './extractors/BaseExtractor.js';
-import CookieManager from './cookieManager.js';
-import { sendAdToServer } from './services/adSender.js';
-import { loadBlacklist } from './utils/blacklist.js';
-import { randomDelay } from './utils/randomDelay.js';
+    externalRefsUrl,
+    cookiesPath,
+} = require("./config");
+
+const BaseExtractor = require("./extractors/BaseExtractor");
+const CookieManager = require("./cookieManager");
+const { sendAdToServer } = require("./services/adSender");
+const { loadBlacklist } = require("./utils/blacklist");
+const { randomDelay } = require("./utils/randomDelay");
 
 class DivarMonitor {
     constructor() {
@@ -18,7 +21,7 @@ class DivarMonitor {
         this.interval = checkInterval;
         this.browser = null;
         this.mainPage = null;
-        this.cookieManager = new CookieManager('./cookies.json');
+        this.cookieManager = new CookieManager(cookiesPath);
         this.extractor = null;
 
         this.isChecking = false;
@@ -36,7 +39,7 @@ class DivarMonitor {
             skippedBecauseOfBlacklist: 0,
             reloadRetries: 0,
             reloadFailures: 0,
-            skippedBecauseLocked: 0
+            skippedBecauseLocked: 0,
         };
     }
 
@@ -60,11 +63,11 @@ class DivarMonitor {
 
         await this.waitForAdsContainer();
 
-        console.log('✅ Monitor initialized successfully.');
+        console.log("✅ Monitor initialized successfully.");
     }
 
     async delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+        return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
     async delayWithJitter(baseMs, jitterMs = 500) {
@@ -75,7 +78,9 @@ class DivarMonitor {
     async withCheckLock(callback) {
         if (this.isChecking) {
             this.statistics.skippedBecauseLocked++;
-            console.warn('⚠️ checkForNewAds skipped because previous check is still running.');
+            console.warn(
+                "⚠️ checkForNewAds skipped because previous check is still running."
+            );
             return;
         }
 
@@ -89,11 +94,11 @@ class DivarMonitor {
     }
 
     async waitForAdsContainer() {
-        const cardLinkSelector = 'article.kt-post-card a.kt-post-card__action';
+        const cardLinkSelector = "article.kt-post-card a.kt-post-card__action";
 
         await this.mainPage.waitForSelector(cardLinkSelector, {
             visible: true,
-            timeout: timeouts.elementWait
+            timeout: timeouts.elementWait,
         });
 
         await this.mainPage.waitForFunction(
@@ -102,7 +107,7 @@ class DivarMonitor {
                 return links && links.length > 0;
             },
             {
-                timeout: timeouts.elementWait
+                timeout: timeouts.elementWait,
             },
             cardLinkSelector
         );
@@ -112,9 +117,9 @@ class DivarMonitor {
 
     async safeNavigate(url, options = {}) {
         const finalOptions = {
-            waitUntil: 'domcontentloaded',
+            waitUntil: "domcontentloaded",
             timeout: timeouts.pageLoad,
-            ...options
+            ...options,
         };
 
         await this.mainPage.goto(url, finalOptions);
@@ -126,19 +131,21 @@ class DivarMonitor {
 
         for (let attempt = 1; attempt <= maxAttempts; attempt++) {
             const useGoto = attempt > 1;
-            const actionLabel = useGoto ? 'goto' : 'reload';
+            const actionLabel = useGoto ? "goto" : "reload";
 
             try {
-                console.log(`🔄 Page refresh attempt ${attempt}/${maxAttempts} using ${actionLabel}...`);
+                console.log(
+                    `🔄 Page refresh attempt ${attempt}/${maxAttempts} using ${actionLabel}...`
+                );
 
                 const currentUrl = this.mainPage.url();
 
-                if (!currentUrl || currentUrl === 'about:blank' || useGoto) {
+                if (!currentUrl || currentUrl === "about:blank" || useGoto) {
                     await this.safeNavigate(this.targetUrl);
                 } else {
                     await this.mainPage.reload({
-                        waitUntil: 'domcontentloaded',
-                        timeout: timeouts.pageLoad
+                        waitUntil: "domcontentloaded",
+                        timeout: timeouts.pageLoad,
                     });
                 }
 
@@ -150,7 +157,9 @@ class DivarMonitor {
                 lastError = error;
                 this.statistics.reloadRetries++;
 
-                console.warn(`⚠️ Reload attempt ${attempt} failed: ${error.message}`);
+                console.warn(
+                    `⚠️ Reload attempt ${attempt} failed: ${error.message}`
+                );
 
                 if (attempt < maxAttempts) {
                     const backoffMs = attempt * 2000;
@@ -161,7 +170,9 @@ class DivarMonitor {
         }
 
         this.statistics.reloadFailures++;
-        throw new Error(`Failed to refresh page after multiple attempts. Last error: ${lastError?.message}`);
+        throw new Error(
+            `Failed to refresh page after multiple attempts. Last error: ${lastError?.message}`
+        );
     }
 
     async getExistingAdIdsFromApi() {
@@ -176,18 +187,25 @@ class DivarMonitor {
 
                 const rawIds = Array.isArray(source)
                     ? source
-                    : source && typeof source === 'object'
+                    : source && typeof source === "object"
                         ? Object.values(source)
                         : [];
 
-                existingAdIds = rawIds.filter(Boolean).map(id => String(id));
+                existingAdIds = rawIds.filter(Boolean).map((id) => String(id));
 
-                console.log(`✅ Number of adIds found in the database: ${existingAdIds.length}`);
+                console.log(
+                    `✅ Number of adIds found in the database: ${existingAdIds.length}`
+                );
             } else {
-                console.warn(`⚠️ Failed to fetch adIds (status: ${response.status})`);
+                console.warn(
+                    `⚠️ Failed to fetch adIds (status: ${response.status})`
+                );
             }
         } catch (apiError) {
-            console.warn('⚠️ Error fetching the list of existing adIds:', apiError.message);
+            console.warn(
+                "⚠️ Error fetching the list of existing adIds:",
+                apiError.message
+            );
         }
 
         return existingAdIds;
@@ -197,9 +215,9 @@ class DivarMonitor {
         const blacklist = loadBlacklist() || [];
 
         const blacklistedAdIds = blacklist
-            .map(item => item?.adId)
+            .map((item) => item?.adId)
             .filter(Boolean)
-            .map(id => String(id));
+            .map((id) => String(id));
 
         console.log(`🚫 Number of blacklisted ads: ${blacklistedAdIds.length}`);
 
@@ -225,73 +243,81 @@ class DivarMonitor {
             await this.reloadMainPageAndWait();
             await this.autoScrollForMoreAds(3);
 
-            const {
-                ads,
-                skippedDbCount,
-                skippedBlacklistCount,
-                rawCardCount
-            } = await this.mainPage.evaluate((existingIds, blacklistedIds) => {
-                const existingSet = new Set(existingIds);
-                const blacklistSet = new Set(blacklistedIds);
+            const { ads, skippedDbCount, skippedBlacklistCount, rawCardCount } =
+                await this.mainPage.evaluate(
+                    (existingIds, blacklistedIds) => {
+                        const existingSet = new Set(existingIds);
+                        const blacklistSet = new Set(blacklistedIds);
 
-                const result = {
-                    ads: [],
-                    skippedDbCount: 0,
-                    skippedBlacklistCount: 0,
-                    rawCardCount: 0
-                };
+                        const result = {
+                            ads: [],
+                            skippedDbCount: 0,
+                            skippedBlacklistCount: 0,
+                            rawCardCount: 0,
+                        };
 
-                const links = Array.from(
-                    document.querySelectorAll('article.kt-post-card a.kt-post-card__action')
+                        const links = Array.from(
+                            document.querySelectorAll(
+                                "article.kt-post-card a.kt-post-card__action"
+                            )
+                        );
+
+                        const seenIds = new Set();
+                        result.rawCardCount = links.length;
+
+                        links.forEach((link, idx) => {
+                            const href = link.getAttribute("href");
+                            if (!href) return;
+
+                            const normalizedUrl = new URL(href, "https://divar.ir");
+                            const pathParts = normalizedUrl.pathname
+                                .split("/")
+                                .filter(Boolean);
+                            const adId = pathParts[pathParts.length - 1];
+
+                            if (!adId || seenIds.has(adId)) return;
+                            seenIds.add(adId);
+
+                            if (existingSet.has(adId)) {
+                                result.skippedDbCount++;
+                                return;
+                            }
+
+                            if (blacklistSet.has(adId)) {
+                                result.skippedBlacklistCount++;
+                                return;
+                            }
+
+                            result.ads.push({
+                                index: idx,
+                                adId,
+                                href,
+                                fullUrl: normalizedUrl.href,
+                            });
+                        });
+
+                        return result;
+                    },
+                    existingAdIds,
+                    blacklistedAdIds
                 );
-
-                const seenIds = new Set();
-                result.rawCardCount = links.length;
-
-                links.forEach((link, idx) => {
-                    const href = link.getAttribute('href');
-                    if (!href) return;
-
-                    const normalizedUrl = new URL(href, 'https://divar.ir');
-                    const pathParts = normalizedUrl.pathname.split('/').filter(Boolean);
-                    const adId = pathParts[pathParts.length - 1];
-
-                    if (!adId || seenIds.has(adId)) return;
-                    seenIds.add(adId);
-
-                    if (existingSet.has(adId)) {
-                        result.skippedDbCount++;
-                        return;
-                    }
-
-                    if (blacklistSet.has(adId)) {
-                        result.skippedBlacklistCount++;
-                        return;
-                    }
-
-                    result.ads.push({
-                        index: idx,
-                        adId,
-                        href,
-                        fullUrl: normalizedUrl.href
-                    });
-                });
-
-                return result;
-            }, existingAdIds, blacklistedAdIds);
 
             this.statistics.skippedBecauseOfDatabase += skippedDbCount;
             this.statistics.skippedBecauseOfBlacklist += skippedBlacklistCount;
 
             console.log(`📄 Number of cards found: ${rawCardCount}`);
-            console.log(`⏭️ Number of ads skipped due to database match: ${skippedDbCount}`);
-            console.log(`🚫 Number of ads skipped due to blacklist: ${skippedBlacklistCount}`);
+            console.log(
+                `⏭️ Number of ads skipped due to database match: ${skippedDbCount}`
+            );
+            console.log(
+                `🚫 Number of ads skipped due to blacklist: ${skippedBlacklistCount}`
+            );
             console.log(`✅ Number of ads ready for processing: ${ads.length}`);
 
             return ads;
         } catch (error) {
             this.statistics.errors++;
-            console.error('❌ Error in getAllAdsLinks:', error.message);
+            console.error("❌ Error in getAllAdsLinks:", error.message);
             return [];
         }
     }
@@ -306,7 +332,7 @@ class DivarMonitor {
             this.statistics.totalAdsFound += adsData.length;
 
             if (adsData.length === 0) {
-                console.log('ℹ️ No new ads found.');
+                console.log("ℹ️ No new ads found.");
                 return;
             }
 
@@ -320,11 +346,13 @@ class DivarMonitor {
                     const adData = await this.extractor.processAd(ad.fullUrl);
 
                     if (!adData) {
-                        console.warn(`⚠️ No data extracted for ad ${ad.adId}; skipping submission.`);
+                        console.warn(
+                            `⚠️ No data extracted for ad ${ad.adId}; skipping submission.`
+                        );
                         continue;
                     }
 
-                    if (adData.adType === 'rent') {
+                    if (adData.adType === "rent") {
                         this.statistics.rentAds++;
                     } else {
                         this.statistics.saleAds++;
@@ -332,10 +360,15 @@ class DivarMonitor {
 
                     await sendAdToServer(adData);
                     this.statistics.successfullySent++;
-                    console.log(`🚀 Ad ${ad.adId} (${adData.adType}) submitted.`);
+                    console.log(
+                        `🚀 Ad ${ad.adId} (${adData.adType}) submitted.`
+                    );
                 } catch (error) {
                     this.statistics.errors++;
-                    console.error(`❌ Error processing/submitting ad ${ad.adId}:`, error.message);
+                    console.error(
+                        `❌ Error processing/submitting ad ${ad.adId}:`,
+                        error.message
+                    );
                 } finally {
                     if (!isLastAd) {
                         await this.waitRandomDelay();
@@ -356,11 +389,11 @@ class DivarMonitor {
     }
 
     logStatistics() {
-        console.log('📊 Current statistics:', JSON.stringify(this.statistics, null, 2));
+        console.log("📊 Current statistics:", JSON.stringify(this.statistics, null, 2));
     }
 
     async startMonitoring() {
-        console.log('🚀 Monitoring started.');
+        console.log("🚀 Monitoring started.");
 
         while (!this.stopRequested) {
             const startedAt = Date.now();
@@ -369,7 +402,7 @@ class DivarMonitor {
                 await this.checkForNewAds();
             } catch (error) {
                 this.statistics.errors++;
-                console.error('❌ Unexpected monitoring error:', error.message);
+                console.error("❌ Unexpected monitoring error:", error.message);
             }
 
             this.logStatistics();
@@ -381,7 +414,7 @@ class DivarMonitor {
             await this.delay(remainingTime);
         }
 
-        console.log('🛑 Monitoring stopped gracefully.');
+        console.log("🛑 Monitoring stopped gracefully.");
     }
 
     async close() {
@@ -400,17 +433,17 @@ class DivarMonitor {
         await monitor.initialize();
 
         const gracefulShutdown = async () => {
-            console.log('🛑 Shutdown signal received...');
+            console.log("🛑 Shutdown signal received...");
             await monitor.close();
             process.exit(0);
         };
 
-        process.on('SIGINT', gracefulShutdown);
-        process.on('SIGTERM', gracefulShutdown);
+        process.on("SIGINT", gracefulShutdown);
+        process.on("SIGTERM", gracefulShutdown);
 
         await monitor.startMonitoring();
     } catch (error) {
-        console.error('❌ General application error:', error.message);
+        console.error("❌ General application error:", error.message);
         await monitor.close();
         process.exit(1);
     }

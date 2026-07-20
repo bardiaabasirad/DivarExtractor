@@ -3,7 +3,7 @@
  * این تابع نباید جریان اصلی را متوقف کند؛ خطاها داخل خودش مدیریت می‌شوند.
  * @param {import('puppeteer').Page} page
  */
-export async function humanScroll(page) {
+async function humanScroll(page) {
   try {
     await page.evaluate(async () => {
       const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -16,17 +16,24 @@ export async function humanScroll(page) {
       while (current < maxScroll) {
         const step = rand(80, 260);
         current = Math.min(current + step, maxScroll);
-        window.scrollTo({ top: current, behavior: 'smooth' });
+        window.scrollTo({ top: current, behavior: "smooth" });
         await sleep(rand(120, 400));
       }
 
       // کمی مکث و بازگشت جزئی به بالا (رفتار طبیعی کاربر)
       await sleep(rand(120, 400));
-      window.scrollTo({ top: current * rand(0.4, 0.7), behavior: 'smooth' });
+      window.scrollTo({
+        top: current * rand(0.4, 0.7),
+        behavior: "smooth",
+      });
       await sleep(rand(120, 400));
     });
   } catch (err) {
     // اسکرول نباید جریان اصلی را متوقف کند
-    console.warn('humanScroll failed:', err.message);
+    console.warn("humanScroll failed:", err.message);
   }
 }
+
+module.exports = {
+  humanScroll,
+};

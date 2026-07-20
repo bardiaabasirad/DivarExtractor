@@ -1,13 +1,13 @@
-import { cityId, timeouts } from '../config.js';
-import { revealPhoneNumber } from '../utils/contactHelper.js';
-import { convertPersianPriceToNumber } from "../utils/priceUtils.js";
-import { addToBlacklist } from '../utils/blacklist.js';
-import { humanScroll } from '../utils/humanScroll.js';
-import { randomDelay } from '../utils/randomDelay.js';
+const { cityId, timeouts } = require('../config');
+const { revealPhoneNumber } = require('../utils/contactHelper');
+const { convertPersianPriceToNumber } = require('../utils/priceUtils');
+const { addToBlacklist } = require('../utils/blacklist');
+const { humanScroll } = require('../utils/humanScroll');
+const { randomDelay } = require('../utils/randomDelay');
 
 const MAP_STYLE_PATTERN = 'base-style-light';
 
-export default class BaseExtractor {
+class BaseExtractor {
     constructor(browser) {
         this.browser = browser;
     }
@@ -375,3 +375,5 @@ export default class BaseExtractor {
     }
 
 }
+
+module.exports = BaseExtractor;

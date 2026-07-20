@@ -1,4 +1,4 @@
-export function convertPersianPriceToNumber(priceString) {
+function convertPersianPriceToNumber(priceString) {
     if (!priceString) return null;
 
     // نقشه تبدیل اعداد فارسی/عربی به انگلیسی
@@ -32,7 +32,7 @@ export function convertPersianPriceToNumber(priceString) {
     result = result.replace(/تومان|ریال|میلیارد|میلیون|هزار/g, '');
     result = result.replace(/\s/g, ''); // حذف فاصله‌ها
 
-    // استخراج بش عددی (با پشتیبانی از اعشار)
+    // استخراج بخش عددی (با پشتیبانی از اعشار)
     const match = result.match(/-?\d+(\.\d+)?/);
     if (!match) return null;
 
@@ -40,3 +40,7 @@ export function convertPersianPriceToNumber(priceString) {
 
     return isNaN(number) ? null : number;
 }
+
+module.exports = {
+    convertPersianPriceToNumber,
+};

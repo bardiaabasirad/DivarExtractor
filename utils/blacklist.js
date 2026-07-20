@@ -1,16 +1,12 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+const fs = require("fs");
+const path = require("path");
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const BLACKLIST_FILE = path.join(__dirname, '../data/blacklisted-ads.json');
+const BLACKLIST_FILE = path.join(__dirname, "../data/blacklisted-ads.json");
 
 /**
  * بارگذاری لیست سیاه از فایل
  */
-export function loadBlacklist() {
+function loadBlacklist() {
     try {
         // ایجاد پوشه data اگر وجود نداشت
         const dataDir = path.dirname(BLACKLIST_FILE);
@@ -19,12 +15,12 @@ export function loadBlacklist() {
         }
 
         if (fs.existsSync(BLACKLIST_FILE)) {
-            const content = fs.readFileSync(BLACKLIST_FILE, 'utf-8');
+            const content = fs.readFileSync(BLACKLIST_FILE, "utf-8");
             return JSON.parse(content);
         }
         return [];
     } catch (error) {
-        console.error('❌ خطا در بارگذاری لیست سیاه:', error.message);
+        console.error("❌ خطا در بارگذاری لیست سیاه:", error.message);
         return [];
     }
 }
@@ -32,7 +28,7 @@ export function loadBlacklist() {
 /**
  * ذخیره لیست سیاه در فایل
  */
-export function saveBlacklist(blacklist) {
+function saveBlacklist(blacklist) {
     try {
         const dataDir = path.dirname(BLACKLIST_FILE);
         if (!fs.existsSync(dataDir)) {
@@ -42,11 +38,11 @@ export function saveBlacklist(blacklist) {
         fs.writeFileSync(
             BLACKLIST_FILE,
             JSON.stringify(blacklist, null, 2),
-            'utf-8'
+            "utf-8"
         );
         return true;
     } catch (error) {
-        console.error('❌ خطا در ذخیره لیست سیاه:', error.message);
+        console.error("❌ خطا در ذخیره لیست سیاه:", error.message);
         return false;
     }
 }
@@ -54,11 +50,11 @@ export function saveBlacklist(blacklist) {
 /**
  * افزودن adId به لیست سیاه
  */
-export function addToBlacklist(adId, reason = 'phone_hidden') {
+function addToBlacklist(adId, reason = "phone_hidden") {
     const blacklist = loadBlacklist();
 
     // بررسی وجود قبلی
-    const exists = blacklist.find(item => item.adId === adId);
+    const exists = blacklist.find((item) => item.adId === adId);
     if (exists) {
         console.log(`⚠️  آگهی ${adId} قبلاً در لیست سیاه وجود دارد`);
         return false;
@@ -68,7 +64,7 @@ export function addToBlacklist(adId, reason = 'phone_hidden') {
     blacklist.push({
         adId,
         reason,
-        addedAt: new Date().toISOString()
+        addedAt: new Date().toISOString(),
     });
 
     saveBlacklist(blacklist);
@@ -79,19 +75,19 @@ export function addToBlacklist(adId, reason = 'phone_hidden') {
 /**
  * بررسی وجود adId در لیست سیاه
  */
-export function isBlacklisted(adId) {
+function isBlacklisted(adId) {
     const blacklist = loadBlacklist();
-    return blacklist.some(item => item.adId === adId);
+    return blacklist.some((item) => item.adId === adId);
 }
 
 /**
  * حذف adId از لیست سیاه
  */
-export function removeFromBlacklist(adId) {
+function removeFromBlacklist(adId) {
     let blacklist = loadBlacklist();
     const initialLength = blacklist.length;
 
-    blacklist = blacklist.filter(item => item.adId !== adId);
+    blacklist = blacklist.filter((item) => item.adId !== adId);
 
     if (blacklist.length < initialLength) {
         saveBlacklist(blacklist);
@@ -106,10 +102,19 @@ export function removeFromBlacklist(adId) {
 /**
  * نمایش آمار لیست سیاه
  */
-export function getBlacklistStats() {
+function getBlacklistStats() {
     const blacklist = loadBlacklist();
     return {
         total: blacklist.length,
-        items: blacklist
+        items: blacklist,
     };
 }
+
+module.exports = {
+    loadBlacklist,
+    saveBlacklist,
+    addToBlacklist,
+    isBlacklisted,
+    removeFromBlacklist,
+    getBlacklistStats,
+};

@@ -1,41 +1,85 @@
-import { getChromeExecutablePath } from './utils/chromePath.js';
-import path from 'path';
+const path = require("path");
+const { getChromeExecutablePath } = require("./utils/chromePath");
 
+// مسیر ریشه پروژه
+const projectRoot = __dirname;
+
+// مسیرهای absolute برای اجرا با PM2
+const chromeProfilePath = path.resolve(projectRoot, "chrome-profile");
+const cookiesPath = path.resolve(projectRoot, "cookies.json");
+
+// تنظیم شهر و URL هدف
 // Khorramabad
-// export const targetUrl = 'https://divar.ir/s/khorramabad/real-estate';
-// export const cityId = 9;
+// const targetUrl = "https://divar.ir/s/khorramabad/real-estate";
+// const cityId = 9;
 
 // Delfan
-export const targetUrl = 'https://divar.ir/s/nurabad/real-estate';
-export const cityId = 21;
+const targetUrl = "https://divar.ir/s/nurabad/real-estate";
+const cityId = 21;
 
-export const externalRefsUrl = 'https://malko.ir/external-refs';
-export const checkInterval = 60000;
-export const apiConfig = {
-    endpoint: 'https://malko.ir/new-place', // آدرس API سرور شما
-    method: 'POST',
+// API
+const externalRefsUrl = "https://malko.ir/external-refs";
+const checkInterval = 60000;
+
+const apiConfig = {
+    endpoint: "https://malko.ir/new-place",
+    method: "POST",
     headers: {
-        'Content-Type': 'application/json',
-    }
+        "Content-Type": "application/json",
+    },
 };
 
-export const puppeteerConfig = {
-    headless: false,
-    executablePath: getChromeExecutablePath(),
-    defaultViewport: null,
-    userDataDir: path.resolve('./chrome-profile'),
-    args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-blink-features=AutomationControlled',
-        '--start-maximized'
-    ]
-};
-
-export const timeouts = {
+// Timeout ها
+const timeouts = {
     pageLoad: 30000,
     elementWait: 10000,
     minDelay: 10,
     maxDelay: 40,
+};
+
+// تشخیص حالت اجرا
+const isLinux = process.platform === "linux";
+const envHeadless = process.env.PUPPETEER_HEADLESS;
+
+const headless =
+    envHeadless === "false"
+        ? false
+        : envHeadless === "true"
+            ? "new"
+            : isLinux
+                ? "new"
+                : false;
+
+const isVisibleMode = headless === false;
+
+// مسیر Chrome
+const chromeExecutablePath = getChromeExecutablePath();
+
+// تنظیمات Puppeteer
+const puppeteerConfig = {
+    headless,
+    executablePath: chromeExecutablePath,
+    defaultViewport: isVisibleMode ? null : { width: 1366, height: 768 },
+    userDataDir: chromeProfilePath,
+    args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-blink-features=AutomationControlled",
+        ...(isVisibleMode ? ["--start-maximized"] : []),
+    ],
+};
+
+module.exports = {
+    projectRoot,
+    chromeProfilePath,
+    cookiesPath,
+    targetUrl,
+    cityId,
+    externalRefsUrl,
+    checkInterval,
+    apiConfig,
+    timeouts,
+    chromeExecutablePath,
+    puppeteerConfig,
 };
