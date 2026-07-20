@@ -10,12 +10,12 @@ const cookiesPath = path.resolve(projectRoot, "cookies.json");
 
 // تنظیم شهر و URL هدف
 // Khorramabad
-// const targetUrl = "https://divar.ir/s/khorramabad/real-estate";
-// const cityId = 9;
+const targetUrl = "https://divar.ir/s/khorramabad/real-estate";
+const cityId = 9;
 
 // Delfan
-const targetUrl = "https://divar.ir/s/nurabad/real-estate";
-const cityId = 21;
+// const targetUrl = "https://divar.ir/s/nurabad/real-estate";
+// const cityId = 21;
 
 // API
 const externalRefsUrl = "https://malko.ir/external-refs";
