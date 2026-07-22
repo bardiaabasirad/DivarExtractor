@@ -254,7 +254,7 @@ class BaseExtractor {
 
             commonData.cityId = cityId;
 
-            // commonData.geo = await this.extractGeoByOpeningMap(page);
+            commonData.geo = await this.extractGeoByApi(page, adUrl);
 
             return { page, data: commonData };
 
@@ -270,32 +270,50 @@ class BaseExtractor {
         }
     }
 
-    async extractGeoByOpeningMap(page) {
+    async extractGeoByApi(page, adUrl) {
         try {
-            await page.waitForSelector('img[alt="موقعیت مکانی"]', { timeout: timeouts.elementWait });
-        } catch {
+            const { token, trackerSessionId } = this.parseAdUrlForApi(adUrl);
+            if (!token) return null;
+
+            let apiUrl = `https://api.divar.ir/v8/posts-v2/web/${encodeURIComponent(token)}`;
+            if (trackerSessionId) {
+                apiUrl += `?tracker_session_id=${encodeURIComponent(trackerSessionId)}`;
+            }
+
+            // درخواست از داخل بستر مرورگر تا کوکی و سشن واقعی حفظ شود
+            const data = await page.evaluate(async (url) => {
+                try {
+                    const res = await fetch(url, {
+                        method: 'GET',
+                        headers: { Accept: 'application/json' },
+                        credentials: 'include',
+                    });
+                    if (!res.ok) return null;
+                    return await res.json();
+                } catch {
+                    return null;
+                }
+            }, apiUrl);
+
+
+            if (!data) return null;
+
+            const mapSection = data.sections.find(s => s.section_name === 'MAP');
+            const location = mapSection?.widgets?.[0]?.data?.location;
+            const point = location?.exact_data?.point ?? location?.fuzzy_data?.point;
+
+            const lat = point?.latitude;
+            const lng = point?.longitude;
+
+            if (typeof lat !== 'number' || typeof lng !== 'number') {
+                return null;
+            }
+
+            return { latitude: lat, longitude: lng };
+        } catch (error) {
+            console.error('❌ خطا در استخراج مختصات از API:', error.message);
             return null;
         }
-
-        const mapStyleResponsePromise = page.waitForResponse(
-            (response) =>
-                response.url().includes(MAP_STYLE_PATTERN) && response.request().method() === 'GET',
-            { timeout: timeouts.elementWait }
-        ).catch(() => null);
-
-        await page.click('img[alt="موقعیت مکانی"]');
-
-        const styleJson = await mapStyleResponsePromise?.then((res) => res.json()).catch(() => null);
-        if (!styleJson?.center || styleJson.center.length < 2) {
-            return null;
-        }
-
-        const [lng, lat] = styleJson.center;
-        if (typeof lat !== 'number' || typeof lng !== 'number') {
-            return null;
-        }
-
-        return { latitude: lat, longitude: lng };
     }
 
     async processAd(adUrl) {
@@ -372,6 +390,19 @@ class BaseExtractor {
         data.totalPrice = convertPersianPriceToNumber(priceData.totalPrice);
         data.pricePerMeter = data.area ? Math.floor(data.totalPrice / Number(data.area)) : null;
         data.floor = convertPersianPriceToNumber(priceData.floor);
+    }
+
+    parseAdUrlForApi(adUrl) {
+        try {
+            const urlObj = new URL(adUrl);
+            // توکن، آخرین بخش غیرخالی مسیر است (مثلا gafdku2D)
+            const segments = urlObj.pathname.split('/').filter(Boolean);
+            const token = segments[segments.length - 1] || null;
+            const trackerSessionId = urlObj.searchParams.get('tracker_session_id');
+            return { token, trackerSessionId };
+        } catch {
+            return { token: null, trackerSessionId: null };
+        }
     }
 
 }

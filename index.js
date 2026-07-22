@@ -61,6 +61,8 @@ class DivarMonitor {
             await this.cookieManager.verifyLogin(this.mainPage);
         }
 
+        await this.cookieManager.saveCookies(this.mainPage);
+
         await this.waitForAdsContainer();
 
         console.log("✅ Monitor initialized successfully.");
@@ -419,6 +421,8 @@ class DivarMonitor {
 
     async close() {
         this.stopRequested = true;
+
+        await this.cookieManager.saveCookies(this.mainPage);
 
         if (this.browser) {
             await this.browser.close();

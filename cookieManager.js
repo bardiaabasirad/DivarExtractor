@@ -89,20 +89,19 @@ class CookieManager {
     }
 
     async saveCookies(page) {
-        try {
-            const cookies = await page.cookies();
-            await fs.writeFile(
-                this.cookieFilePath,
-                JSON.stringify(cookies, null, 2),
-                "utf-8"
-            );
+        const cookies = await page.cookies();
+        const tempPath = `${this.cookieFilePath}.tmp`;
 
-            console.log(`✅ ${cookies.length} cookies saved`);
-            return true;
-        } catch (error) {
-            console.error("❌ Error saving cookies:", error.message);
-            return false;
-        }
+        await fs.writeFile(
+            tempPath,
+            JSON.stringify(cookies, null, 2),
+            "utf-8"
+        );
+
+        await fs.rename(tempPath, this.cookieFilePath);
+
+        console.log(`✅ ${cookies.length} cookies saved`);
+        return true;
     }
 
     async verifyLogin(page, options = {}) {

@@ -1,0 +1,852 @@
+{
+    "sections": [
+        {
+            "section_name": "BREADCRUMB",
+            "widgets": [
+                {
+                    "widget_type": "BREADCRUMB",
+                    "data": {
+                        "@type": "type.googleapis.com/widgets.BreadcrumbData",
+                        "parent_items": [
+                            {
+                                "title": "املاک",
+                                "action": {
+                                    "type": "OPEN_POSTLIST_PAGE_GRPC",
+                                    "payload": {
+                                        "@type": "type.googleapis.com/widgets.OpenPostListPageGRPCPayload",
+                                        "search_data": {
+                                            "form_data": {
+                                                "data": {
+                                                    "category": {
+                                                        "str": {
+                                                            "value": "real-estate"
+                                                        }
+                                                    }
+                                                },
+                                                "online_request_response_data": {}
+                                            },
+                                            "query": "",
+                                            "query_input_type": "UNKNOWN"
+                                        },
+                                        "source_view": "CATEGORY_BREAD_CRUMB",
+                                        "tooltip": "",
+                                        "refresh": false,
+                                        "source_view_str": "CATEGORY_BREAD_CRUMB",
+                                        "is_not_link": false,
+                                        "referer": "",
+                                        "navigation_type": "NAVIGATION_TYPE_UNKNOWN"
+                                    },
+                                    "page_pop_link": false
+                                }
+                            },
+                            {
+                                "title": "اجارهٔ دفتر اداری و تجاری",
+                                "action": {
+                                    "type": "OPEN_POSTLIST_PAGE_GRPC",
+                                    "payload": {
+                                        "@type": "type.googleapis.com/widgets.OpenPostListPageGRPCPayload",
+                                        "search_data": {
+                                            "form_data": {
+                                                "data": {
+                                                    "category": {
+                                                        "str": {
+                                                            "value": "commercial-rent"
+                                                        }
+                                                    }
+                                                },
+                                                "online_request_response_data": {}
+                                            },
+                                            "query": "",
+                                            "query_input_type": "UNKNOWN"
+                                        },
+                                        "source_view": "CATEGORY_BREAD_CRUMB",
+                                        "tooltip": "",
+                                        "refresh": false,
+                                        "source_view_str": "CATEGORY_BREAD_CRUMB",
+                                        "is_not_link": false,
+                                        "referer": "",
+                                        "navigation_type": "NAVIGATION_TYPE_UNKNOWN"
+                                    },
+                                    "page_pop_link": false
+                                }
+                            },
+                            {
+                                "title": "اجارهٔ مغازه و غرفه",
+                                "action": {
+                                    "type": "OPEN_POSTLIST_PAGE_GRPC",
+                                    "payload": {
+                                        "@type": "type.googleapis.com/widgets.OpenPostListPageGRPCPayload",
+                                        "search_data": {
+                                            "form_data": {
+                                                "data": {
+                                                    "category": {
+                                                        "str": {
+                                                            "value": "shop-rent"
+                                                        }
+                                                    }
+                                                },
+                                                "online_request_response_data": {}
+                                            },
+                                            "query": "",
+                                            "query_input_type": "UNKNOWN"
+                                        },
+                                        "source_view": "CATEGORY_BREAD_CRUMB",
+                                        "tooltip": "",
+                                        "refresh": false,
+                                        "source_view_str": "CATEGORY_BREAD_CRUMB",
+                                        "is_not_link": false,
+                                        "referer": "",
+                                        "navigation_type": "NAVIGATION_TYPE_UNKNOWN"
+                                    },
+                                    "page_pop_link": false
+                                }
+                            }
+                        ],
+                        "current_page_title": "یک باب مغازه ۶۰ متری ۴ در ۱۳ در خلیفه اباد",
+                        "padded": true
+                    },
+                    "visibility_condition": [],
+                    "uid": ""
+                }
+            ]
+        },
+        {
+            "section_name": "TITLE",
+            "widgets": [
+                {
+                    "widget_type": "LEGEND_TITLE_ROW",
+                    "data": {
+                        "@type": "type.googleapis.com/widgets.LegendTitleRowData",
+                        "title": "یک باب مغازه ۶۰ متری ۴ در ۱۳ در خلیفه اباد",
+                        "subtitle": "",
+                        "has_divider": false,
+                        "image_url": "",
+                        "tags": [],
+                        "show_thumbnail": false,
+                        "mobile_design": false,
+                        "high_level_heading": true,
+                        "padding": "NO_PADDING"
+                    },
+                    "visibility_condition": [],
+                    "uid": ""
+                },
+                {
+                    "widget_type": "EXPANDABLE_SECTION",
+                    "data": {
+                        "@type": "type.googleapis.com/widgets.ExpandableSectionData",
+                        "widget_list": [
+                            {
+                                "widget_type": "DESCRIPTION_ROW",
+                                "data": {
+                                    "@type": "type.googleapis.com/widgets.DescriptionRowData",
+                                    "text": "انتشار آگهی: ۲۰ تیر ۱۴۰۵، ۱۶:۳۵\nآخرین نردبان: ۳۰ تیر ۱۴۰۵، ۱۴:۲۷",
+                                    "has_divider": false,
+                                    "is_primary": true,
+                                    "expandable": false,
+                                    "small": true,
+                                    "padded": false,
+                                    "preview_max_line": 0,
+                                    "text_alignment": "RIGHT"
+                                },
+                                "visibility_condition": [],
+                                "uid": ""
+                            }
+                        ],
+                        "title": "هفته پیش در نورآباد، جاده خلیفه آباد",
+                        "icon": {
+                            "image_url_dark": "",
+                            "image_url_light": "",
+                            "icon_name": "UNKNOWN",
+                            "icon_color": "UNKNOWN"
+                        },
+                        "is_expanded": false
+                    },
+                    "visibility_condition": [],
+                    "uid": ""
+                },
+                {
+                    "widget_type": "SELECTOR_ROW",
+                    "data": {
+                        "@type": "type.googleapis.com/widgets.SelectorRowData",
+                        "title": "زنگ خطرهای قبل از معامله",
+                        "image_url": "",
+                        "action": {
+                            "type": "OPEN_PAGE",
+                            "payload": {
+                                "@type": "type.googleapis.com/widgets.OpenPagePayload",
+                                "request_http_method": "POST",
+                                "request_data": {
+                                    "@type": "type.googleapis.com/post_api_v2.GetFraudAlertPageRequest.Data",
+                                    "category": "shop-rent"
+                                },
+                                "page": "UNKNOWN_PAGE",
+                                "specification": {
+                                    "@type": "type.googleapis.com/widgets.OpenPagePayload.SimplePageSpecification",
+                                    "has_bottom_navbar": false,
+                                    "has_search": false,
+                                    "search_placeholder": "",
+                                    "navigation_button": "BACK",
+                                    "disable_silent_fetch": false
+                                },
+                                "page_type": "SIMPLE_PAGE",
+                                "is_modal": true,
+                                "rest_request_path": "/v8/postview/fraud-alert",
+                                "grpc_request_path": "/post_api_v2.PostApi/GetFraudAlertPage"
+                            },
+                            "page_pop_link": false
+                        },
+                        "has_divider": true,
+                        "has_notification": false,
+                        "icon": {
+                            "image_url_dark": "https://s100.divarcdn.com/static/imgs/widget-icons/dark/icon_secondary/v1/warning.png",
+                            "image_url_light": "https://s100.divarcdn.com/static/imgs/widget-icons/light/icon_secondary/v1/warning.png",
+                            "icon_name": "WARNING",
+                            "icon_color": "ICON_SECONDARY"
+                        },
+                        "notification_text": "",
+                        "description": "",
+                        "has_arrow": true,
+                        "small": false,
+                        "last_notification_date": "0001-01-01T00:00:00Z",
+                        "uid": "",
+                        "fullwidth": false,
+                        "truncate_title": false
+                    },
+                    "action_log": {
+                        "server_side_info": {
+                            "info": {
+                                "@type": "type.googleapis.com/action_log.PostWarningInfo",
+                                "post_token": "gaS9zJUw"
+                            },
+                            "item_type": {
+                                "type": "POST_WARNING"
+                            }
+                        },
+                        "enabled": true
+                    },
+                    "visibility_condition": [],
+                    "uid": ""
+                }
+            ]
+        },
+        {
+            "section_name": "DESCRIPTION",
+            "widgets": [
+                {
+                    "widget_type": "TITLE_ROW",
+                    "data": {
+                        "@type": "type.googleapis.com/widgets.TitleRowData",
+                        "text": "توضیحات",
+                        "has_divider": false,
+                        "color": "",
+                        "text_color": "TEXT_PRIMARY",
+                        "description": "",
+                        "description_color": "UNKNOWN",
+                        "subtitle": "",
+                        "subtitle_color": "UNKNOWN",
+                        "text_type": "SECONDARY",
+                        "type": "UNKNOWN_TYPE",
+                        "show_required": false,
+                        "state": "TITLE_ROW_STATE_UNKNOWN",
+                        "is_sticky_header": false
+                    },
+                    "visibility_condition": [],
+                    "uid": ""
+                },
+                {
+                    "widget_type": "DESCRIPTION_ROW",
+                    "data": {
+                        "@type": "type.googleapis.com/widgets.DescriptionRowData",
+                        "text": "یک باب مغازه ۶۰ متری ۴ در ۱۳ در خلیفه اباد سر پیچ خیابان ۱۶ متری اول سرتخته دارای اب برق گاز",
+                        "has_divider": false,
+                        "is_primary": true,
+                        "expandable": false,
+                        "small": false,
+                        "padded": false,
+                        "preview_max_line": 0,
+                        "text_alignment": "RIGHT"
+                    },
+                    "visibility_condition": [],
+                    "uid": ""
+                }
+            ]
+        },
+        {
+            "section_name": "IMAGE",
+            "widgets": [
+                {
+                    "widget_type": "IMAGE_CAROUSEL",
+                    "data": {
+                        "@type": "type.googleapis.com/widgets.ImageCarouselData",
+                        "items": [
+                            {
+                                "image_url": "",
+                                "image": {
+                                    "url": "https://postimage01.divarcdn.com/static/photo/neda/webp_post/eU8pvwKkPwgmTbRT7zUY8g/0db09c1d-f1ac-4489-b5ed-d5c606a0392a.webp",
+                                    "alt": "یک باب مغازه ۶۰ متری ۴ در ۱۳ در خلیفه اباد|اجارهٔ مغازه و غرفه|نورآباد, |دیوار",
+                                    "thumbnail_url": "https://postimage01.divarcdn.com/static/photo/neda/webp_thumbnail/G_SieWq6ZPAsPubIstaREg/0db09c1d-f1ac-4489-b5ed-d5c606a0392a.webp"
+                                },
+                                "video_url": ""
+                            },
+                            {
+                                "image_url": "",
+                                "image": {
+                                    "url": "https://postimage01.divarcdn.com/static/photo/neda/webp_post/DInEKv87cYyJl9JcYyAYzQ/2fc67c6d-9619-47c5-8592-c06fabc540c2.webp",
+                                    "alt": "یک باب مغازه ۶۰ متری ۴ در ۱۳ در خلیفه اباد|اجارهٔ مغازه و غرفه|نورآباد, |دیوار",
+                                    "thumbnail_url": "https://postimage01.divarcdn.com/static/photo/neda/webp_thumbnail/atCQTFhLSYEA69BN1uieuA/2fc67c6d-9619-47c5-8592-c06fabc540c2.webp"
+                                },
+                                "video_url": ""
+                            },
+                            {
+                                "image_url": "",
+                                "image": {
+                                    "url": "https://postimage01.divarcdn.com/static/photo/neda/webp_post/QNu8QAb5qExOWNxkSVdOfg/0d8ba7dd-c0b7-42a9-ad4b-6c74cdbaaf1d.webp",
+                                    "alt": "یک باب مغازه ۶۰ متری ۴ در ۱۳ در خلیفه اباد|اجارهٔ مغازه و غرفه|نورآباد, |دیوار",
+                                    "thumbnail_url": "https://postimage01.divarcdn.com/static/photo/neda/webp_thumbnail/6Sm_jF5uS1holNgzMUPVqw/0d8ba7dd-c0b7-42a9-ad4b-6c74cdbaaf1d.webp"
+                                },
+                                "video_url": ""
+                            },
+                            {
+                                "image_url": "",
+                                "image": {
+                                    "url": "https://postimage01.divarcdn.com/static/photo/neda/webp_post/EE9g5xunuj-Y_Ue60h46Wg/2e2bdcd0-ac8b-4151-bd9d-3fb6badc2da8.webp",
+                                    "alt": "یک باب مغازه ۶۰ متری ۴ در ۱۳ در خلیفه اباد|اجارهٔ مغازه و غرفه|نورآباد, |دیوار",
+                                    "thumbnail_url": "https://postimage01.divarcdn.com/static/photo/neda/webp_thumbnail/udb6H9Uptuit2vs-gujcQw/2e2bdcd0-ac8b-4151-bd9d-3fb6badc2da8.webp"
+                                },
+                                "video_url": ""
+                            }
+                        ],
+                        "padded": false,
+                        "image_aspect_ratio": {
+                            "dynamic_aspect_ratio": {
+                                "height": 3,
+                                "width": 4
+                            }
+                        },
+                        "has_preview": true,
+                        "has_thumbnails": true,
+                        "scale_type": "CENTER_CROP",
+                        "show_tooltip": true,
+                        "tooltip_data": {
+                            "icon": {
+                                "image_url_dark": "https://s100.divarcdn.com/static/imgs/widget-icons/dark/white_primary/v1/fullscreen.png",
+                                "image_url_light": "https://s100.divarcdn.com/static/imgs/widget-icons/light/white_primary/v1/fullscreen.png",
+                                "icon_name": "FULLSCREEN",
+                                "icon_color": "WHITE_PRIMARY"
+                            },
+                            "text": "۴"
+                        }
+                    },
+                    "visibility_condition": [],
+                    "uid": ""
+                }
+            ]
+        },
+        {
+            "section_name": "LIST_DATA",
+            "widgets": [
+                {
+                    "widget_type": "GROUP_INFO_ROW",
+                    "data": {
+                        "@type": "type.googleapis.com/widgets.GroupInfoRow",
+                        "items": [
+                            {
+                                "title": "متراژ",
+                                "value": "۶۰"
+                            },
+                            {
+                                "title": "ساخت",
+                                "value": "۱۴۰۴"
+                            },
+                            {
+                                "title": "اتاق",
+                                "value": "بدون اتاق"
+                            }
+                        ],
+                        "has_divider": true
+                    },
+                    "visibility_condition": [],
+                    "uid": ""
+                },
+                {
+                    "widget_type": "UNEXPANDABLE_ROW",
+                    "data": {
+                        "@type": "type.googleapis.com/widgets.UnexpandableRowData",
+                        "title": "تصویر‌ها برای همین ملک است؟",
+                        "value": "بله",
+                        "has_divider": true,
+                        "compact": false,
+                        "has_copy_to_clipboard": false,
+                        "send_action_log_on_copy": false
+                    },
+                    "visibility_condition": [],
+                    "uid": ""
+                },
+                {
+                    "widget_type": "UNEXPANDABLE_ROW",
+                    "data": {
+                        "@type": "type.googleapis.com/widgets.UnexpandableRowData",
+                        "title": "ودیعه",
+                        "value": "‏۴۰,۰۰۰,۰۰۰ تومان",
+                        "has_divider": true,
+                        "compact": false,
+                        "has_copy_to_clipboard": false,
+                        "send_action_log_on_copy": false
+                    },
+                    "visibility_condition": [],
+                    "uid": ""
+                },
+                {
+                    "widget_type": "UNEXPANDABLE_ROW",
+                    "data": {
+                        "@type": "type.googleapis.com/widgets.UnexpandableRowData",
+                        "title": "اجارهٔ ماهانه",
+                        "value": "‏۳,۵۰۰,۰۰۰ تومان",
+                        "has_divider": true,
+                        "compact": false,
+                        "has_copy_to_clipboard": false,
+                        "send_action_log_on_copy": false
+                    },
+                    "visibility_condition": [],
+                    "uid": ""
+                },
+                {
+                    "widget_type": "UNEXPANDABLE_ROW",
+                    "data": {
+                        "@type": "type.googleapis.com/widgets.UnexpandableRowData",
+                        "title": "ودیعه و اجاره",
+                        "value": "غیر قابل تبدیل",
+                        "has_divider": true,
+                        "compact": false,
+                        "has_copy_to_clipboard": false,
+                        "send_action_log_on_copy": false
+                    },
+                    "visibility_condition": [],
+                    "uid": ""
+                },
+                {
+                    "widget_type": "SELECTOR_ROW",
+                    "data": {
+                        "@type": "type.googleapis.com/widgets.SelectorRowData",
+                        "title": "سایر ویژگی‌ها و امکانات",
+                        "image_url": "",
+                        "action": {
+                            "type": "LOAD_MODAL_PAGE",
+                            "payload": {
+                                "@type": "type.googleapis.com/widgets.LoadModalPagePayload",
+                                "modal_page": {
+                                    "title": "ویژگی‌ها و امکانات",
+                                    "widget_list": [
+                                        {
+                                            "widget_type": "UNEXPANDABLE_ROW",
+                                            "data": {
+                                                "@type": "type.googleapis.com/widgets.UnexpandableRowData",
+                                                "title": "تعداد دهنه",
+                                                "value": "۱۶",
+                                                "has_divider": true,
+                                                "compact": false,
+                                                "has_copy_to_clipboard": false,
+                                                "send_action_log_on_copy": false
+                                            },
+                                            "visibility_condition": [],
+                                            "uid": ""
+                                        },
+                                        {
+                                            "widget_type": "DESCRIPTION_ROW",
+                                            "data": {
+                                                "@type": "type.googleapis.com/widgets.DescriptionRowData",
+                                                "text": "انشعابات",
+                                                "has_divider": false,
+                                                "is_primary": true,
+                                                "expandable": true,
+                                                "small": false,
+                                                "padded": true,
+                                                "preview_max_line": 4,
+                                                "text_alignment": "RIGHT"
+                                            },
+                                            "visibility_condition": [],
+                                            "uid": ""
+                                        },
+                                        {
+                                            "widget_type": "WRAPPER_ROW",
+                                            "data": {
+                                                "@type": "type.googleapis.com/widgets.WrapperRowData",
+                                                "chip_list": {
+                                                    "chips": [
+                                                        {
+                                                            "text": "آب",
+                                                            "type": "ACTION",
+                                                            "style": "NORMAL",
+                                                            "rounded": false,
+                                                            "small": true
+                                                        },
+                                                        {
+                                                            "text": "برق",
+                                                            "type": "ACTION",
+                                                            "style": "NORMAL",
+                                                            "rounded": false,
+                                                            "small": true
+                                                        },
+                                                        {
+                                                            "text": "گاز",
+                                                            "type": "ACTION",
+                                                            "style": "NORMAL",
+                                                            "rounded": false,
+                                                            "small": true
+                                                        }
+                                                    ]
+                                                },
+                                                "padded": true
+                                            },
+                                            "visibility_condition": [],
+                                            "uid": ""
+                                        }
+                                    ],
+                                    "has_close_button": false
+                                }
+                            },
+                            "page_pop_link": false
+                        },
+                        "has_divider": true,
+                        "has_notification": false,
+                        "icon": {
+                            "image_url_dark": "",
+                            "image_url_light": "",
+                            "icon_name": "UNKNOWN",
+                            "icon_color": "UNKNOWN"
+                        },
+                        "notification_text": "",
+                        "description": "",
+                        "has_arrow": true,
+                        "small": false,
+                        "last_notification_date": "0001-01-01T00:00:00Z",
+                        "uid": "",
+                        "fullwidth": true,
+                        "truncate_title": false
+                    },
+                    "action_log": {
+                        "server_side_info": {
+                            "info": {
+                                "@type": "type.googleapis.com/action_log.ViewPostFeaturesInfo",
+                                "post_token": "gaS9zJUw"
+                            },
+                            "item_type": {
+                                "type": "VIEW_POST_FEATURES"
+                            }
+                        },
+                        "enabled": true
+                    },
+                    "visibility_condition": [],
+                    "uid": ""
+                }
+            ]
+        },
+        {
+            "section_name": "TAGS",
+            "widgets": [
+                {
+                    "widget_type": "WRAPPER_ROW",
+                    "data": {
+                        "@type": "type.googleapis.com/widgets.WrapperRowData",
+                        "chip_list": {
+                            "chips": [
+                                {
+                                    "text": "اجارهٔ مغازه و غرفه",
+                                    "type": "ACTION",
+                                    "style": "NORMAL",
+                                    "rounded": false,
+                                    "small": false,
+                                    "action": {
+                                        "type": "OPEN_POSTLIST_PAGE_GRPC",
+                                        "payload": {
+                                            "@type": "type.googleapis.com/widgets.OpenPostListPageGRPCPayload",
+                                            "search_data": {
+                                                "form_data": {
+                                                    "data": {
+                                                        "category": {
+                                                            "str": {
+                                                                "value": "shop-rent"
+                                                            }
+                                                        }
+                                                    },
+                                                    "online_request_response_data": {}
+                                                },
+                                                "query": "",
+                                                "query_input_type": "UNKNOWN"
+                                            },
+                                            "source_view": "CATEGORY_BREAD_CRUMB",
+                                            "tooltip": "",
+                                            "refresh": false,
+                                            "source_view_str": "CATEGORY_BREAD_CRUMB",
+                                            "is_not_link": false,
+                                            "referer": "",
+                                            "navigation_type": "NAVIGATION_TYPE_UNKNOWN"
+                                        },
+                                        "page_pop_link": false
+                                    }
+                                }
+                            ]
+                        },
+                        "padded": false
+                    },
+                    "visibility_condition": [],
+                    "uid": ""
+                }
+            ]
+        },
+        {
+            "section_name": "MAP",
+            "widgets": [
+                {
+                    "widget_type": "MAP_ROW",
+                    "data": {
+                        "@type": "type.googleapis.com/widgets.MapRowData",
+                        "location": {
+                            "type": "EXACT",
+                            "exact_data": {
+                                "point": {
+                                    "latitude": 34.07348311984,
+                                    "longitude": 47.993117102856
+                                }
+                            }
+                        },
+                        "image_url": "https://mapimage.divarcdn.com/v8/mapimage?encrypted_data=MTIzNDU2Nzg5MTIzXOotBHQ5HqzuQolZOlcwJPRLbFzyQjbIHx3MP3Ibq3Fb-A==",
+                        "preview_type": "STATIC_IMAGE"
+                    },
+                    "action_log": {
+                        "server_side_info": {
+                            "info": {
+                                "@type": "type.googleapis.com/action_log.MapInfo",
+                                "post_token": "gaS9zJUw"
+                            },
+                            "item_type": {
+                                "type": "MAP"
+                            }
+                        },
+                        "enabled": true
+                    },
+                    "visibility_condition": [],
+                    "uid": ""
+                }
+            ]
+        },
+        {
+            "section_name": "NOTE",
+            "widgets": [
+                {
+                    "widget_type": "NOTE",
+                    "data": {
+                        "@type": "type.googleapis.com/widgets.NoteData",
+                        "title": "یادداشت من",
+                        "button_title": "ویرایش یادداشت",
+                        "post_token": "gaS9zJUw",
+                        "icon_button": {
+                            "icon": {
+                                "image_url_dark": "https://s100.divarcdn.com/static/imgs/widget-icons/dark/icon_secondary/v1/more_vert.png",
+                                "image_url_light": "https://s100.divarcdn.com/static/imgs/widget-icons/light/icon_secondary/v1/more_vert.png",
+                                "icon_name": "MORE_VERT",
+                                "icon_color": "ICON_SECONDARY"
+                            },
+                            "action": {
+                                "type": "LOAD_MENU",
+                                "payload": {
+                                    "@type": "type.googleapis.com/widgets.LoadMenuPayload",
+                                    "menu": {
+                                        "title": "",
+                                        "items": [
+                                            {
+                                                "text": "ویرایش یادداشت",
+                                                "icon": {
+                                                    "image_url_dark": "https://s100.divarcdn.com/static/imgs/widget-icons/dark/icon_secondary/v1/edit.png",
+                                                    "image_url_light": "https://s100.divarcdn.com/static/imgs/widget-icons/light/icon_secondary/v1/edit.png",
+                                                    "icon_name": "EDIT",
+                                                    "icon_color": "ICON_SECONDARY"
+                                                },
+                                                "disabled": false,
+                                                "action": {
+                                                    "type": "NOTE",
+                                                    "payload": {
+                                                        "@type": "type.googleapis.com/widgets.NotePayload",
+                                                        "post_token": "gaS9zJUw",
+                                                        "max_character_count": 256
+                                                    },
+                                                    "page_pop_link": false
+                                                },
+                                                "alignment": "RIGHT",
+                                                "state": "STATE_UNKNOWN"
+                                            },
+                                            {
+                                                "text": "حذف یادداشت",
+                                                "icon": {
+                                                    "image_url_dark": "https://s100.divarcdn.com/static/imgs/widget-icons/dark/icon_primary/v1/trash_o.png",
+                                                    "image_url_light": "https://s100.divarcdn.com/static/imgs/widget-icons/light/icon_primary/v1/trash_o.png",
+                                                    "icon_name": "TRASH_O",
+                                                    "icon_color": "ICON_PRIMARY"
+                                                },
+                                                "disabled": false,
+                                                "action": {
+                                                    "type": "MAKE_NETWORK_CALL",
+                                                    "payload": {
+                                                        "@type": "type.googleapis.com/widgets.MakeNetworkCallPayload",
+                                                        "grpc_request_path": "/yaad_v2.YaadV2/DeleteNoteV2",
+                                                        "rest_request_path": "/yaad/delete-note-v2",
+                                                        "request_data": {
+                                                            "@type": "type.googleapis.com/yaad_v2.DeleteNoteV2Request.RequestData",
+                                                            "token": "gaS9zJUw"
+                                                        },
+                                                        "needs_auth": true
+                                                    },
+                                                    "page_pop_link": false
+                                                },
+                                                "alignment": "RIGHT",
+                                                "state": "STATE_NEGATIVE"
+                                            }
+                                        ],
+                                        "banner": {
+                                            "title": "",
+                                            "text": "",
+                                            "image_url": ""
+                                        }
+                                    },
+                                    "display_type": "LOAD_MENU_DISPLAY_TYPE_BOTTOM_SHEET"
+                                },
+                                "page_pop_link": false
+                            },
+                            "alt_text": "",
+                            "disable": false
+                        }
+                    },
+                    "visibility_condition": [],
+                    "uid": ""
+                }
+            ]
+        },
+        {
+            "section_name": "STATIC",
+            "widgets": [
+                {
+                    "widget_type": "SELECTOR_ROW",
+                    "data": {
+                        "@type": "type.googleapis.com/widgets.SelectorRowData",
+                        "title": "گزارش آگهی",
+                        "image_url": "",
+                        "action": {
+                            "type": "OPEN_FORM_PAGE",
+                            "payload": {
+                                "@type": "type.googleapis.com/widgets.OpenFormPagePayload",
+                                "grpc_servicer": "/post_quality.PostQualityFeedback/GetFeedbackForm",
+                                "request_data": {
+                                    "@type": "type.googleapis.com/post_quality.GetFeedbackFormRequest.RequestData",
+                                    "post_token": "gaS9zJUw"
+                                },
+                                "rest_request_path": "/v8/post-quality/feedback-form"
+                            },
+                            "page_pop_link": false
+                        },
+                        "has_divider": true,
+                        "has_notification": false,
+                        "icon": {
+                            "image_url_dark": "https://s100.divarcdn.com/static/imgs/widget-icons/dark/icon_secondary/v1/report.png",
+                            "image_url_light": "https://s100.divarcdn.com/static/imgs/widget-icons/light/icon_secondary/v1/report.png",
+                            "icon_name": "REPORT",
+                            "icon_color": "ICON_SECONDARY"
+                        },
+                        "notification_text": "",
+                        "description": "",
+                        "has_arrow": false,
+                        "small": false,
+                        "last_notification_date": "0001-01-01T00:00:00Z",
+                        "uid": "",
+                        "fullwidth": false,
+                        "truncate_title": false
+                    },
+                    "visibility_condition": [],
+                    "uid": ""
+                }
+            ]
+        }
+    ],
+    "share": {
+        "title": "یک باب مغازه ۶۰ متری ۴ در ۱۳ در خلیفه اباد",
+        "web_url": "https://divar.ir/v/gaS9zJUw",
+        "image_url": ""
+    },
+    "seo": {
+        "title": "اجاره یک باب مغازه ۶۰ متری ۴ در ۱۳ در خلیفه اباد در نورآباد - ۳۰ تیر ۱۴۰۵",
+        "description": "آگهی یک باب مغازه ۶۰ متری ۴ در ۱۳ در خلیفه اباد در دیوار نورآباد",
+        "android_package_name": "ir.divar",
+        "android_app_url": "android-app://ir.divar/http/v/یک باب مغازه ۶۰ متری ۴ در ۱۳ در خلیفه اباد/gaS9zJUw/",
+        "web_info": {
+            "title": "یک باب مغازه ۶۰ متری ۴ در ۱۳ در خلیفه اباد",
+            "district_persian": "",
+            "city_persian": "نورآباد",
+            "category_slug_persian": "اجارهٔ مغازه و غرفه"
+        },
+        "unavailable_after": "2026-08-11T16:35:09.231914",
+        "bread_crumb": []
+    },
+    "contact": {
+        "chat_enabled": true,
+        "apply_enabled": false,
+        "contact_encrypted_data": "",
+        "secure_call_enabled": false,
+        "experimental_api_enabled": false,
+        "action_log": {
+            "server_side_info": {
+                "info": {
+                    "@type": "type.googleapis.com/action_log.ContactInfoInfo",
+                    "post_token": "gaS9zJUw",
+                    "source_view": "",
+                    "event_id": "",
+                    "method_name": "GetContactWeb",
+                    "experimental_api_enabled": false,
+                    "contact_uuid": "3d8b1aab-85cd-4449-84d8-439b6bbe1a5d",
+                    "contact_layer_experiment_id": 0,
+                    "tracker_session_id": "d83e7a22-52c3-496a-b64b-a45c63c75660_gaS9zJUw_N",
+                    "call_method": "UNKNOWN"
+                },
+                "item_type": {
+                    "type": "CONTACT_INFO"
+                }
+            },
+            "enabled": true
+        },
+        "contact_uuid": "3d8b1aab-85cd-4449-84d8-439b6bbe1a5d",
+        "tracker_session_id": "d83e7a22-52c3-496a-b64b-a45c63c75660_gaS9zJUw_N",
+        "supplier_chat_assistant_enabled": false,
+        "eshop_enabled": false
+    },
+    "webengage": {
+        "cat_1": "real-estate",
+        "token": "gaS9zJUw",
+        "business_type": "personal",
+        "price": 0,
+        "cat_3": "shop-rent",
+        "source_view": "",
+        "brand_model": "",
+        "business_ref": "",
+        "originality": "",
+        "city": "nurabad",
+        "image_count": 4,
+        "credit": 40000000,
+        "cat_2": "commercial-rent",
+        "rent": 3500000,
+        "status": "",
+        "category": "shop-rent",
+        "district": "",
+        "gender": ""
+    },
+    "analytics": {
+        "cat1": "real-estate",
+        "cat2": "commercial-rent",
+        "cat3": "shop-rent",
+        "city": "nurabad"
+    },
+    "city": {
+        "city_id": "753",
+        "name": "نورآباد",
+        "parent_id": "884",
+        "is_province": false,
+        "second_slug": "nurabad"
+    }
+}
