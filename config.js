@@ -8,14 +8,14 @@ const projectRoot = __dirname;
 const chromeProfilePath = path.resolve(projectRoot, "chrome-profile");
 const cookiesPath = path.resolve(projectRoot, "cookies.json");
 
-// تنظیم شهر و URL هدف
-// Khorramabad
-// const targetUrl = "https://divar.ir/s/khorramabad/real-estate?recent_ads=1d";
-// const cityId = 9;
+const cities = {
+  khorramabad: { url: "https://divar.ir/s/khorramabad/real-estate?recent_ads=1d", cityId: 9 },
+  nurabad:      { url: "https://divar.ir/s/nurabad/real-estate?recent_ads=1d",     cityId: 21 },
+};
 
-// Delfan
-const targetUrl = "https://divar.ir/s/nurabad/real-estate?recent_ads=1d";
-const cityId = 21;
+const selectedCity = cities[process.env.CITY] || cities["nurabad"];
+const targetUrl = selectedCity.url;
+const cityId    = selectedCity.cityId;
 
 // API
 const externalRefsUrl = "https://malko.ir/external-refs";
